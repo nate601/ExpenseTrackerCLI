@@ -1,0 +1,244 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace expenseTrackerCli
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            while (true)
+            {
+                var db = new Database.Database();
+                Console.WriteLine("NMF Record Generator");
+                Console.WriteLine("1: Add new Orderable");
+                Console.WriteLine("2: Add new Order");
+
+                var userSelection = Console.ReadLine();
+                if (userSelection == "1")
+                {
+                    //Add New Orderable	
+                    orderablePrompt(db);
+                }
+                else if (userSelection == "2")
+                {
+                    orderPrompt(db);
+                }
+                else
+                {
+                    Console.WriteLine("Invalid Entry");
+                }
+            }
+        }
+	
+        private static void orderPrompt(Database.Database db)
+        {
+
+            var orderableItems = db.GetOrderables();
+            Database.ExpenseOrder order = new Database.ExpenseOrder();
+	    order.OrderDate = new DateTime(AskUserNumber("Year"), AskUserNumber("Month"), AskUserNumber("Day"));
+            //order.OrderDate = DateTime.Now;
+            int daysUntilThursday = ((int)DayOfWeek.Thursday - (int)order.OrderDate.DayOfWeek + 7) % 7;
+            order.ExpectedDateOneCycle = order.OrderDate.AddDays(daysUntilThursday);
+            order.ExpectedDateTwoCycle = order.ExpectedDateOneCycle.AddDays(7);
+
+            order.orderedItems = new Dictionary<Database.OrderableItem, Database.ExpenseOrder.OrderedItemInfo>();
+            while (true)
+            {
+                displayOrderPreorder(order);
+                Console.WriteLine("Add item by (w)ic, or search by (n)ame.");
+                Console.WriteLine("(s)uggested Order");
+                Console.WriteLine("(f)inish order");
+                var resp = AskUser("");
+                if (resp == "w")
+                {
+                    var wic = AskUserNumber("Wic");
+                    if (orderableItems.Any((x) => x.Wic == wic))
+                    {
+                        if (order.orderedItems.ContainsKey(orderableItems.First((x) => x.Wic == wic)))
+                        {
+                            Console.WriteLine("That item is already in the order.");
+                            Database.ExpenseOrder.OrderedItemInfo oldItem = order.orderedItems.First((x) => x.Key.Wic == wic).Value;
+                            oldItem.onHand = AskUserNumber($"Modify on hand amount ({oldItem.onHand})");
+                            oldItem.orderedAmount = AskUserNumber($"Modify ordered amount ({oldItem.orderedAmount})");
+                        }
+                        else
+                        {
+
+                            order.orderedItems.Add(orderableItems.First((x) => x.Wic == wic), new Database.ExpenseOrder.OrderedItemInfo(AskUserNumber("On hand amount"), AskUserNumber("Ordered Amount")));
+                        }
+                    }
+                    else
+                    {
+
+                        Console.WriteLine("Invalid Wic");
+			if(AskUserBool("Add new item? (true/false)"))
+			{
+
+			    orderablePrompt(db);
+			    continue;
+			}
+                    }
+                }
+                else if (resp == "f")
+                {
+                    break;
+                }
+                else if (resp == "s")
+
+                {
+                    var suggestedWics = new Dictionary<int, int>()
+            {
+                {957754, 3},
+                {828188, 4},
+                {829838, 4},
+                {829839, 1},
+                {829841, 1},
+                {962843, 8},
+                {958293, 5},
+                {964586, 2},
+                {958292, 1},
+                {964588, 1},
+                {475071, 1},
+                {475070, 1},
+                {475069, 1},
+                {475068, 1},
+                {475067, 1},
+                {475066, 1},
+                {475065, 1},
+                {959737, 1},
+                {958843, 1},
+		{345150, 3},
+		{963233, 4},
+		{216735, 1},
+		{219561, 1},
+		{225610, 3},
+		{964880, 3},
+		{961510, 3},
+		{274002, 1},
+		{151913, 1},
+		{957507, 1},
+            };
+                    foreach (var k in suggestedWics)
+                    {
+                        if (orderableItems.Any((x) => x.Wic == k.Key))
+                        {
+                            var item = orderableItems.First((x) => x.Wic == k.Key);
+                            Console.WriteLine($"{item.Wic} : {item.ItemName}");
+                            var onHand = AskUserNumber("On Hand");
+                            int orderThis;
+                            if (onHand < k.Value)
+                            {
+                                orderThis = k.Value - onHand;
+                            }
+                            else { orderThis = 0; }
+                            Console.WriteLine("Suggested on hand value should be " + k.Value);
+
+                            if (orderThis != 0)
+                            {
+                                if (!AskUserBool("Order this amount? (" + orderThis + ") (true/false)"))
+                                {
+                                    order.orderedItems.Add(item, new Database.ExpenseOrder.OrderedItemInfo(onHand, AskUserNumber("Quantity")));
+                                }
+                                else
+                                {
+                                    order.orderedItems.Add(item, new Database.ExpenseOrder.OrderedItemInfo(onHand, orderThis));
+                                }
+                            }
+                            else
+                            {
+                                if (AskUserBool("Current amount is sufficient. Order more? (true/false)"))
+                                {
+                                    order.orderedItems.Add(item, new Database.ExpenseOrder.OrderedItemInfo(onHand, AskUserNumber("Quantity")));
+                                }
+				else{
+                                    order.orderedItems.Add(item, new Database.ExpenseOrder.OrderedItemInfo(onHand, 0));
+				}
+                            }
+
+                        }
+                    }
+                }
+
+
+            }
+	    db.SaveNewOrder(order);
+
+        }
+        private static void displayOrderPreorder(Database.ExpenseOrder order)
+        {
+            Console.Clear();
+            Console.WriteLine($"Order for {order.OrderDate.ToShortDateString()}");
+            Console.WriteLine($"Expected Arrival {order.ExpectedDateOneCycle.ToShortDateString(),6} ({order.ExpectedDateTwoCycle.ToShortDateString():d2})");
+            Console.WriteLine();
+            Console.WriteLine("Items: ");
+            Console.WriteLine();
+            Console.WriteLine($"|Wic   |Item Name      |On Hand|Ordered|");
+            Console.WriteLine();
+            foreach (var s in order.orderedItems)
+            {
+                Console.WriteLine($"|{s.Key.Wic,6:d6}|{s.Key.ItemName,-15}|{s.Value.onHand,7:d3}|{s.Value.orderedAmount,7:d3}|");
+            }
+            Console.WriteLine();
+        }
+	private static void displayOrderResolve(Database.ExpenseOrder order)
+	{
+	    Console.Clear();
+            Console.WriteLine($"Order for {order.OrderDate.ToShortDateString()}");
+            Console.WriteLine($"Expected Arrival {order.ExpectedDateOneCycle.ToShortDateString(),6} ({order.ExpectedDateTwoCycle.ToShortDateString():d2})");
+            Console.WriteLine();
+            Console.WriteLine("Items: ");
+            Console.WriteLine();
+            Console.WriteLine($"|Wic   |Item Name      |On Hand|Ordered|New On Hand|Recieved|Deficit|");
+            Console.WriteLine();
+            foreach (var s in order.orderedItems)
+            {
+                Console.WriteLine($"|{s.Key.Wic,6:d6}|{s.Key.ItemName,-15}|{s.Value.onHand,7:d3}|{s.Value.orderedAmount,7:d3}|");
+            }
+            Console.WriteLine();
+
+	    
+	}
+
+        private static void orderablePrompt(Database.Database db)
+        {
+            Database.OrderableItem item = new Database.OrderableItem(
+                AskUserNumber("Wic"),
+                AskUser("Item Name"),
+                AskUserNumber("Package Size"),
+                AskUserBool("Two Week Cycle (true/false)")
+                );
+            db.SaveNewOrderableItem(item);
+        }
+
+        private static bool AskUserBool(string v)
+        {
+            while (true)
+            {
+                var resp = AskUser(v);
+                if (bool.TryParse(resp, out var result))
+                {
+                    return result;
+                }
+            }
+        }
+
+        private static string AskUser(string prompt)
+        {
+            Console.Write($"{prompt}: ");
+            return Console.ReadLine();
+        }
+        private static int AskUserNumber(string prompt)
+        {
+            while (true)
+            {
+                var resp = AskUser(prompt);
+                if (int.TryParse(resp, out var k))
+                {
+                    return k;
+                }
+            }
+        }
+    }
+}

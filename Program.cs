@@ -65,18 +65,16 @@ namespace expenseTrackerCli
                         }
                         else
                         {
-
                             order.orderedItems.Add(orderableItems.First((x) => x.Wic == wic), new Database.ExpenseOrder.OrderedItemInfo(AskUserNumber("On hand amount"), AskUserNumber("Ordered Amount")));
                         }
                     }
                     else
                     {
-
                         Console.WriteLine("Invalid Wic");
 			if(AskUserBool("Add new item? (true/false)"))
 			{
-
 			    orderablePrompt(db);
+			    orderableItems = db.GetOrderables();
 			    continue;
 			}
                     }
@@ -86,7 +84,6 @@ namespace expenseTrackerCli
                     break;
                 }
                 else if (resp == "s")
-
                 {
                     var suggestedWics = new Dictionary<int, int>()
             {
@@ -156,12 +153,9 @@ namespace expenseTrackerCli
                                     order.orderedItems.Add(item, new Database.ExpenseOrder.OrderedItemInfo(onHand, 0));
 				}
                             }
-
                         }
                     }
                 }
-
-
             }
 	    db.SaveNewOrder(order);
 
@@ -197,8 +191,6 @@ namespace expenseTrackerCli
                 Console.WriteLine($"|{s.Key.Wic,6:d6}|{s.Key.ItemName,-15}|{s.Value.onHand,7:d3}|{s.Value.orderedAmount,7:d3}|");
             }
             Console.WriteLine();
-
-	    
 	}
 
         private static void orderablePrompt(Database.Database db)

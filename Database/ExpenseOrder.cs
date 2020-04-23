@@ -17,41 +17,41 @@ namespace expenseTrackerCli.Database
             BinaryFormatter formatter = new BinaryFormatter();
             FileStream fs = File.Open("orders.dat", FileMode.Open);
             object obj = formatter.Deserialize(fs);
-	    fs.Flush();
-	    fs.Close();
-	    fs.Dispose();
+            fs.Flush();
+            fs.Close();
+            fs.Dispose();
             return (ExpenseOrder[])obj;
         }
         public void SaveNewOrder(ExpenseOrder order)
         {
             BinaryFormatter formatter = new BinaryFormatter();
-	    var newOrders = GetOrders().Append(order).ToArray();
+            var newOrders = GetOrders().Append(order).ToArray();
             File.Delete("orders.dat");
-	    Stream ms = File.OpenWrite("orders.dat");
-	    formatter.Serialize(ms, newOrders );
+            Stream ms = File.OpenWrite("orders.dat");
+            formatter.Serialize(ms, newOrders);
 
             ms.Flush();
             ms.Close();
             ms.Dispose();
         }
-	private void OverwriteOrders(ExpenseOrder[] orders)
-	{
-	    BinaryFormatter formatter = new BinaryFormatter();
+        private void OverwriteOrders(ExpenseOrder[] orders)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
             File.Delete("orders.dat");
-	    Stream ms = File.OpenWrite("orders.dat");
-	    formatter.Serialize(ms, orders );
+            Stream ms = File.OpenWrite("orders.dat");
+            formatter.Serialize(ms, orders);
 
             ms.Flush();
             ms.Close();
             ms.Dispose();
 
-	}
-	public void DeleteOrder(ExpenseOrder[] orders, int index)
-	{
-	    var k = orders.ToList();
-	    k.RemoveAt(index);
-	    OverwriteOrders(orders);
-	}
+        }
+        public void DeleteOrder(ExpenseOrder[] orders, int index)
+        {
+            var k = orders.ToList();
+            k.RemoveAt(index);
+            OverwriteOrders(orders);
+        }
     }
 
     [Serializable]
@@ -61,10 +61,11 @@ namespace expenseTrackerCli.Database
         public DateTime ExpectedDateOneCycle;
         public DateTime ExpectedDateTwoCycle;
         public Dictionary<OrderableItem, OrderedItemInfo> orderedItems;
-		
-	public class OrderedItemInfo
-	{
-	    public int onHand, orderedAmount;
+
+        [Serializable]
+        public class OrderedItemInfo
+        {
+            public int onHand, orderedAmount;
 
             public OrderedItemInfo(int onHand, int orderedAmount)
             {

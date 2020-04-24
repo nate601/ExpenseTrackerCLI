@@ -57,19 +57,9 @@ namespace expenseTrackerCli.Database
         public DateTime OrderDate;
         public DateTime ExpectedDateOneCycle;
         public DateTime ExpectedDateTwoCycle;
+        public ItemResolution resolution;
         public Dictionary<OrderableItem, OrderedItemInfo> orderedItems;
 
-        [Serializable]
-        public class OrderedItemInfo
-        {
-            public int onHand, orderedAmount;
-
-            public OrderedItemInfo(int onHand, int orderedAmount)
-            {
-                this.onHand = onHand;
-                this.orderedAmount = orderedAmount;
-            }
-        }
 
         public ExpenseOrder()
         {
@@ -81,6 +71,30 @@ namespace expenseTrackerCli.Database
             ExpectedDateOneCycle = expectedDateOneCycle;
             ExpectedDateTwoCycle = expectedDateTwoCycle;
             this.orderedItems = orderedItems;
+	    resolution = new ItemResolution(false, null);
+        }
+    }
+    [Serializable]
+    public class ItemResolution
+    {
+        public bool received;
+        public DateTime? ReceptionDate;
+
+        public ItemResolution(bool received, DateTime? receptionDate)
+        {
+            this.received = received;
+            ReceptionDate = receptionDate;
+        }
+    }
+    [Serializable]
+    public class OrderedItemInfo
+    {
+        public int onHand, orderedAmount;
+
+        public OrderedItemInfo(int onHand, int orderedAmount)
+        {
+            this.onHand = onHand;
+            this.orderedAmount = orderedAmount;
         }
     }
 }

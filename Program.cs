@@ -16,34 +16,44 @@ namespace expenseTrackerCli
                 Console.WriteLine("2: Add new Order");
 
                 var userSelection = Console.ReadLine();
-                if (userSelection == "1")
+                switch (userSelection)
                 {
-                    //Add New Orderable	
-                    orderablePrompt(db);
-                }
-                else if (userSelection == "2")
-                {
-                    orderPrompt(db);
-                }
-                else
-                {
-                    Console.WriteLine("Invalid Entry");
+                    case "1":
+                        //Add New Orderable	
+                        orderablePrompt(db);
+                        break;
+                    case "2":
+                        //Add New Order
+                        orderPrompt(db);
+                        break;
+                    case "3":
+                        displayOrderables(db);
+                        break;
+                    default:
+                        Console.WriteLine("Invalid Entry");
+                        break;
                 }
             }
         }
 
+        private static void displayOrderables(Database.Database db)
+        {
+            throw new NotImplementedException();
+        }
         private static void orderPrompt(Database.Database db)
         {
 
             var orderableItems = db.GetOrderables();
             Database.ExpenseOrder order = new Database.ExpenseOrder();
-            order.OrderDate = new DateTime(AskUserNumber("Year"), AskUserNumber("Month"), AskUserNumber("Day"));
+            order.OrderDate = new DateTime(AskUserNumber("Year"),
+                                           AskUserNumber("Month"),
+                                           AskUserNumber("Day"));
             //order.OrderDate = DateTime.Now;
             int daysUntilThursday = ((int)DayOfWeek.Thursday - (int)order.OrderDate.DayOfWeek + 7) % 7;
             order.ExpectedDateOneCycle = order.OrderDate.AddDays(daysUntilThursday);
             order.ExpectedDateTwoCycle = order.ExpectedDateOneCycle.AddDays(7);
 
-            order.orderedItems = new Dictionary<Database.OrderableItem, Database.ExpenseOrder.OrderedItemInfo>();
+            order.orderedItems = new Dictionary<Database.OrderableItem, Database.OrderedItemInfo>();
             while (true)
             {
                 displayOrderPreorder(order);
@@ -59,13 +69,13 @@ namespace expenseTrackerCli
                         if (order.orderedItems.ContainsKey(orderableItems.First((x) => x.Wic == wic)))
                         {
                             Console.WriteLine("That item is already in the order.");
-                            Database.ExpenseOrder.OrderedItemInfo oldItem = order.orderedItems.First((x) => x.Key.Wic == wic).Value;
+                            Database.OrderedItemInfo oldItem = order.orderedItems.First((x) => x.Key.Wic == wic).Value;
                             oldItem.onHand = AskUserNumber($"Modify on hand amount ({oldItem.onHand})");
                             oldItem.orderedAmount = AskUserNumber($"Modify ordered amount ({oldItem.orderedAmount})");
                         }
                         else
                         {
-                            order.orderedItems.Add(orderableItems.First((x) => x.Wic == wic), new Database.ExpenseOrder.OrderedItemInfo(AskUserNumber("On hand amount"), AskUserNumber("Ordered Amount")));
+                            order.orderedItems.Add(orderableItems.First((x) => x.Wic == wic), new Database.OrderedItemInfo(AskUserNumber("On hand amount"), AskUserNumber("Ordered Amount")));
                         }
                     }
                     else
@@ -115,44 +125,41 @@ namespace expenseTrackerCli
         {961510, 3},
         {274002, 1},
         {151913, 1},
-        {957507, 1},
+        {957507, 1}
             }
-            )
+                    .Where(k => orderableItems.Any((x) => x.Wic == k.Key)))
                     {
-                        if (orderableItems.Any((x) => x.Wic == k.Key))
+                        var item = orderableItems.First((x) => x.Wic == k.Key);
+                        Console.WriteLine($"{item.Wic} : {item.ItemName}");
+                        var onHand = AskUserNumber("On Hand");
+                        int orderThis;
+                        if (onHand < k.Value)
                         {
-                            var item = orderableItems.First((x) => x.Wic == k.Key);
-                            Console.WriteLine($"{item.Wic} : {item.ItemName}");
-                            var onHand = AskUserNumber("On Hand");
-                            int orderThis;
-                            if (onHand < k.Value)
-                            {
-                                orderThis = k.Value - onHand;
-                            }
-                            else { orderThis = 0; }
-                            Console.WriteLine("Suggested on hand value should be " + k.Value);
+                            orderThis = k.Value - onHand;
+                        }
+                        else { orderThis = 0; }
 
-                            if (orderThis != 0)
+                        Console.WriteLine("Suggested on hand value should be " + k.Value);
+                        if (orderThis != 0)
+                        {
+                            if (!AskUserBool("Order this amount? (" + orderThis + ")"))
                             {
-                                if (!AskUserBool("Order this amount? (" + orderThis + ") (true/false)"))
-                                {
-                                    order.orderedItems.Add(item, new Database.ExpenseOrder.OrderedItemInfo(onHand, AskUserNumber("Quantity")));
-                                }
-                                else
-                                {
-                                    order.orderedItems.Add(item, new Database.ExpenseOrder.OrderedItemInfo(onHand, orderThis));
-                                }
+                                order.orderedItems.Add(item, new Database.OrderedItemInfo(onHand, AskUserNumber("Quantity")));
                             }
                             else
                             {
-                                if (AskUserBool("Current amount is sufficient. Order more? (true/false)"))
-                                {
-                                    order.orderedItems.Add(item, new Database.ExpenseOrder.OrderedItemInfo(onHand, AskUserNumber("Quantity")));
-                                }
-                                else
-                                {
-                                    order.orderedItems.Add(item, new Database.ExpenseOrder.OrderedItemInfo(onHand, 0));
-                                }
+                                order.orderedItems.Add(item, new Database.OrderedItemInfo(onHand, orderThis));
+                            }
+                        }
+                        else
+                        {
+                            if (AskUserBool("Current amount is sufficient. Order more?"))
+                            {
+                                order.orderedItems.Add(item, new Database.OrderedItemInfo(onHand, AskUserNumber("Quantity")));
+                            }
+                            else
+                            {
+                                order.orderedItems.Add(item, new Database.OrderedItemInfo(onHand, 0));
                             }
                         }
                     }
@@ -209,7 +216,15 @@ namespace expenseTrackerCli
         {
             while (true)
             {
-                var resp = AskUser(v);
+                var resp = AskUser($"{v} (true/false) or (1/0)");
+                if (resp == "0")
+                {
+                    return false;
+                }
+                else if (resp == "1")
+                {
+                    return true;
+                }
                 if (bool.TryParse(resp, out var result))
                 {
                     return result;

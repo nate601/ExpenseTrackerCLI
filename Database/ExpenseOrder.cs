@@ -29,7 +29,6 @@ namespace expenseTrackerCli.Database
             File.Delete("orders.dat");
             Stream ms = File.OpenWrite("orders.dat");
             formatter.Serialize(ms, newOrders);
-
             ms.Flush();
             ms.Close();
             ms.Dispose();
@@ -40,11 +39,9 @@ namespace expenseTrackerCli.Database
             File.Delete("orders.dat");
             Stream ms = File.OpenWrite("orders.dat");
             formatter.Serialize(ms, orders);
-
             ms.Flush();
             ms.Close();
             ms.Dispose();
-
         }
         public void DeleteOrder(ExpenseOrder[] orders, int index)
         {

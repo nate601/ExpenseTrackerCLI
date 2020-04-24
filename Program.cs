@@ -31,13 +31,13 @@ namespace expenseTrackerCli
                 }
             }
         }
-	
+
         private static void orderPrompt(Database.Database db)
         {
 
             var orderableItems = db.GetOrderables();
             Database.ExpenseOrder order = new Database.ExpenseOrder();
-	    order.OrderDate = new DateTime(AskUserNumber("Year"), AskUserNumber("Month"), AskUserNumber("Day"));
+            order.OrderDate = new DateTime(AskUserNumber("Year"), AskUserNumber("Month"), AskUserNumber("Day"));
             //order.OrderDate = DateTime.Now;
             int daysUntilThursday = ((int)DayOfWeek.Thursday - (int)order.OrderDate.DayOfWeek + 7) % 7;
             order.ExpectedDateOneCycle = order.OrderDate.AddDays(daysUntilThursday);
@@ -71,12 +71,12 @@ namespace expenseTrackerCli
                     else
                     {
                         Console.WriteLine("Invalid Wic");
-			if(AskUserBool("Add new item? (true/false)"))
-			{
-			    orderablePrompt(db);
-			    orderableItems = db.GetOrderables();
-			    continue;
-			}
+                        if (AskUserBool("Add new item? (true/false)"))
+                        {
+                            orderablePrompt(db);
+                            orderableItems = db.GetOrderables();
+                            continue;
+                        }
                     }
                 }
                 else if (resp == "f")
@@ -85,7 +85,7 @@ namespace expenseTrackerCli
                 }
                 else if (resp == "s")
                 {
-                    var suggestedWics = new Dictionary<int, int>()
+                    foreach (var k in new Dictionary<int, int>()
             {
                 {957754, 3},
                 {828188, 4},
@@ -106,18 +106,18 @@ namespace expenseTrackerCli
                 {475065, 1},
                 {959737, 1},
                 {958843, 1},
-		{345150, 3},
-		{963233, 4},
-		{216735, 1},
-		{219561, 1},
-		{225610, 3},
-		{964880, 3},
-		{961510, 3},
-		{274002, 1},
-		{151913, 1},
-		{957507, 1},
-            };
-                    foreach (var k in suggestedWics)
+        {345150, 3},
+        {963233, 4},
+        {216735, 1},
+        {219561, 1},
+        {225610, 3},
+        {964880, 3},
+        {961510, 3},
+        {274002, 1},
+        {151913, 1},
+        {957507, 1},
+            }
+            )
                     {
                         if (orderableItems.Any((x) => x.Wic == k.Key))
                         {
@@ -149,15 +149,16 @@ namespace expenseTrackerCli
                                 {
                                     order.orderedItems.Add(item, new Database.ExpenseOrder.OrderedItemInfo(onHand, AskUserNumber("Quantity")));
                                 }
-				else{
+                                else
+                                {
                                     order.orderedItems.Add(item, new Database.ExpenseOrder.OrderedItemInfo(onHand, 0));
-				}
+                                }
                             }
                         }
                     }
                 }
             }
-	    db.SaveNewOrder(order);
+            db.SaveNewOrder(order);
 
         }
         private static void displayOrderPreorder(Database.ExpenseOrder order)
@@ -176,9 +177,9 @@ namespace expenseTrackerCli
             }
             Console.WriteLine();
         }
-	private static void displayOrderResolve(Database.ExpenseOrder order)
-	{
-	    Console.Clear();
+        private static void displayOrderResolve(Database.ExpenseOrder order)
+        {
+            Console.Clear();
             Console.WriteLine($"Order for {order.OrderDate.ToShortDateString()}");
             Console.WriteLine($"Expected Arrival {order.ExpectedDateOneCycle.ToShortDateString(),6} ({order.ExpectedDateTwoCycle.ToShortDateString():d2})");
             Console.WriteLine();
@@ -191,7 +192,7 @@ namespace expenseTrackerCli
                 Console.WriteLine($"|{s.Key.Wic,6:d6}|{s.Key.ItemName,-15}|{s.Value.onHand,7:d3}|{s.Value.orderedAmount,7:d3}|");
             }
             Console.WriteLine();
-	}
+        }
 
         private static void orderablePrompt(Database.Database db)
         {

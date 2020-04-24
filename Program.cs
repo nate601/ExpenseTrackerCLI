@@ -81,7 +81,7 @@ namespace expenseTrackerCli
                     else
                     {
                         Console.WriteLine("Invalid Wic");
-                        if (AskUserBool("Add new item? (true/false)"))
+                        if (AskUserBool("Add new item?"))
                         {
                             orderablePrompt(db);
                             orderableItems = db.GetOrderables();
@@ -207,7 +207,7 @@ namespace expenseTrackerCli
                 AskUserNumber("Wic"),
                 AskUser("Item Name"),
                 AskUserNumber("Package Size"),
-                AskUserBool("Two Week Cycle (true/false)")
+                AskUserBool("Two Week Cycle")
                 );
             db.SaveNewOrderableItem(item);
         }

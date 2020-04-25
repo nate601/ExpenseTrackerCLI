@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using expenseTrackerCli.Database;
 
 namespace expenseTrackerCli
 {
@@ -38,7 +39,42 @@ namespace expenseTrackerCli
 
         private static void displayOrderables(Database.Database db)
         {
-            throw new NotImplementedException();
+            var orderables = db.GetOrderables().OrderBy((x) => x.Wic).ToArray();
+
+            int numberPerPage = 5;
+            int numberOfPages = orderables.Length / numberPerPage;
+            int pageIndex = 0;
+
+            while (true)
+            {
+                if (pageIndex < 0) pageIndex = 0;
+                if (pageIndex > numberOfPages) pageIndex = numberOfPages;
+                Console.Clear();
+                var currentPage = orderables.Skip((pageIndex) * numberPerPage).Take(numberPerPage).ToArray();
+                Console.WriteLine($"Displaying {currentPage.Count()} of {orderables.Length} items. Page {pageIndex + 1} / {numberOfPages + 1 }.");
+                Console.WriteLine();
+                foreach (var k in currentPage)
+                {
+                }
+                for (var i = 0; i < currentPage.Count(); i++)
+                {
+                    var k = currentPage[i];
+                    Console.WriteLine($"{k.Wic}|{k.ItemName}");
+                }
+                var resp = AskUser("(n)ext page, (p)rev page, or press a number to edit.");
+                if (resp == "n")
+                {
+                    pageIndex++;
+                }
+                else if (resp == "p")
+                {
+                    pageIndex--;
+                }
+                else if (int.TryParse(resp, out var ind) && ind > 0 && ind <= currentPage.Count())
+                {
+                    var currentItem = currentPage.ToArray()[ind - 1];
+                }
+            }
         }
         private static void orderPrompt(Database.Database db)
         {

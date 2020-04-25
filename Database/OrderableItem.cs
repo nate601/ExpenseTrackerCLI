@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace expenseTrackerCli.Database
@@ -19,7 +20,7 @@ namespace expenseTrackerCli.Database
 	    fs.Flush();
 	    fs.Close();
 	    fs.Dispose();
-	    return (OrderableItem[])obj;
+	    return CleanOrderableItems((OrderableItem[])obj);
 	}
         public void SaveNewOrderableItem(OrderableItem item) => SaveNew<OrderableItem>(item,
             GetOrderables(),
@@ -35,6 +36,18 @@ namespace expenseTrackerCli.Database
             ms.Close();
             ms.Dispose();
         }
+	public OrderableItem[] CleanOrderableItems(OrderableItem[] items)
+	{
+	    var retVal = items.ToList();
+	    foreach(var item in items)
+	    {
+		if(items.Where(x=>x.Wic == item.Wic).Count() > 1)
+		{
+		   retVal.Remove(retVal.First(x=>x.Wic == item.Wic)); 
+		}
+	    }
+	    return retVal.ToArray();
+	}
     }
     [Serializable]
     public class OrderableItem

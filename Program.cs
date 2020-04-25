@@ -53,13 +53,13 @@ namespace expenseTrackerCli
                 var currentPage = orderables.Skip((currentPageIndex) * numberPerPage).Take(numberPerPage).ToArray();
                 Console.WriteLine($"Displaying {currentPage.Count()} of {orderables.Length} items. Page {currentPageIndex + 1} / {numberOfPages + 1 }.");
                 Console.WriteLine();
-		Console.WriteLine($"|Index|Wic   |Name             |Cycle|");
+                Console.WriteLine($"|Index|Wic   |Name             |Cycle|");
                 for (var i = 0; i < currentPage.Count(); i++)
                 {
                     var k = currentPage[i];
                     Console.WriteLine($"{i + 1,5:d2}|{k.Wic,6:d6}|{k.ItemName,-17}");
                 }
-                var resp = AskUser("(n)ext page, (p)rev page, or press a number to edit.");
+                var resp = AskUser("(n)ext page, (p)rev page, (q)uit, or press a number to edit.");
                 if (resp == "n")
                 {
                     currentPageIndex++;
@@ -68,39 +68,49 @@ namespace expenseTrackerCli
                 {
                     currentPageIndex--;
                 }
+		else if (resp == "q")
+		{
+		    return;
+		}
                 else if (int.TryParse(resp, out var selectedItemIndex)
                          && selectedItemIndex > 0
                          && selectedItemIndex <= currentPage.Count())
                 {
                     var selectedItem = currentPage.ToArray()[selectedItemIndex - 1];
+                    var oldWic = selectedItem.Wic;
                     while (true)
                     {
                         resp = AskUser("(d)elete, (c)hange wic, change (n)ame, change c(y)cle, (f)inish)");
-			switch(resp)
-			{
-			    case "d":
-				selectedItem = null;
-				break;
-			    case "c":
-				selectedItem.Wic = int.Parse(new string(AskUserNumber("New wic?").ToString().ToArray().Take(6).ToArray()));
-				break;
-			    case "n":
-				selectedItem.ItemName = AskUser("New name?");
-				break;
-			    case "y":
-				selectedItem.twoWeekCycle = !selectedItem.twoWeekCycle;
-				break;
-			    case "f":
-				goto finishEdit;
-			    default:
-				break;
-			}
+
+                        switch (resp)
+                        {
+                            case "d":
+                                selectedItem = null;
+                                goto finishEdit;
+                            case "c":
+                                selectedItem.Wic = int.Parse(new string(AskUserNumber("New wic?").ToString().ToArray().Take(6).ToArray()));
+                                goto finishEdit;
+                            case "n":
+                                selectedItem.ItemName = AskUser("New name?");
+                                goto finishEdit;
+                            case "y":
+                                selectedItem.twoWeekCycle = !selectedItem.twoWeekCycle;
+                                goto finishEdit;
+                            case "f":
+                                goto finishEdit;
+                            default:
+                                break;
+                        }
                     }
-finishEdit:
-		    if(selectedItem == null)
-			break;
-                    var newOrderables = orderables.Where((x) => x.Wic != selectedItem.Wic).Append(selectedItem);
+                finishEdit:
+                    IEnumerable<OrderableItem> newOrderables;
+                    if (selectedItem != null)
+                        newOrderables = orderables.Where((x) => x.Wic != oldWic).Append(selectedItem);
+                    else
+                        newOrderables = orderables.Where((x) => x.Wic != oldWic);
                     db.OverwriteOrderableItems(newOrderables.ToArray());
+                    orderables = db.GetOrderables().OrderBy((x) => x.Wic).ToArray();
+                    numberOfPages = orderables.Length / numberPerPage;
                 }
             }
         }

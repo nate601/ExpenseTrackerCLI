@@ -53,9 +53,6 @@ namespace expenseTrackerCli
                 var currentPage = orderables.Skip((pageIndex) * numberPerPage).Take(numberPerPage).ToArray();
                 Console.WriteLine($"Displaying {currentPage.Count()} of {orderables.Length} items. Page {pageIndex + 1} / {numberOfPages + 1 }.");
                 Console.WriteLine();
-                foreach (var k in currentPage)
-                {
-                }
                 for (var i = 0; i < currentPage.Count(); i++)
                 {
                     var k = currentPage[i];

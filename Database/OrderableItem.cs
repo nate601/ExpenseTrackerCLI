@@ -25,6 +25,16 @@ namespace expenseTrackerCli.Database
             GetOrderables(),
             "orderable.dat");
 
+        public void OverwriteOrderableItems(OrderableItem[] items)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            File.Delete("orderable.dat");
+            Stream ms = File.OpenWrite("orderable.dat");
+            formatter.Serialize(ms, items);
+            ms.Flush();
+            ms.Close();
+            ms.Dispose();
+        }
     }
     [Serializable]
     public class OrderableItem

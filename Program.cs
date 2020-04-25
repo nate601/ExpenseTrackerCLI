@@ -15,7 +15,7 @@ namespace expenseTrackerCli
                 Console.WriteLine("NMF Record Generator");
                 Console.WriteLine("1: Add new Orderable");
                 Console.WriteLine("2: Add new Order");
-
+                Console.WriteLine("3: Edit orderable database");
                 var userSelection = Console.ReadLine();
                 switch (userSelection)
                 {
@@ -43,15 +43,15 @@ namespace expenseTrackerCli
 
             int numberPerPage = 5;
             int numberOfPages = orderables.Length / numberPerPage;
-            int pageIndex = 0;
+            int currentPageIndex = 0;
 
             while (true)
             {
-                if (pageIndex < 0) pageIndex = 0;
-                if (pageIndex > numberOfPages) pageIndex = numberOfPages;
+                if (currentPageIndex < 0) currentPageIndex = 0;
+                if (currentPageIndex > numberOfPages) currentPageIndex = numberOfPages;
                 Console.Clear();
-                var currentPage = orderables.Skip((pageIndex) * numberPerPage).Take(numberPerPage).ToArray();
-                Console.WriteLine($"Displaying {currentPage.Count()} of {orderables.Length} items. Page {pageIndex + 1} / {numberOfPages + 1 }.");
+                var currentPage = orderables.Skip((currentPageIndex) * numberPerPage).Take(numberPerPage).ToArray();
+                Console.WriteLine($"Displaying {currentPage.Count()} of {orderables.Length} items. Page {currentPageIndex + 1} / {numberOfPages + 1 }.");
                 Console.WriteLine();
                 for (var i = 0; i < currentPage.Count(); i++)
                 {
@@ -61,15 +61,17 @@ namespace expenseTrackerCli
                 var resp = AskUser("(n)ext page, (p)rev page, or press a number to edit.");
                 if (resp == "n")
                 {
-                    pageIndex++;
+                    currentPageIndex++;
                 }
                 else if (resp == "p")
                 {
-                    pageIndex--;
+                    currentPageIndex--;
                 }
-                else if (int.TryParse(resp, out var ind) && ind > 0 && ind <= currentPage.Count())
+                else if (int.TryParse(resp, out var selectedItemIndex)
+                         && selectedItemIndex > 0
+                         && selectedItemIndex <= currentPage.Count())
                 {
-                    var currentItem = currentPage.ToArray()[ind - 1];
+                    var selectedItem = currentPage.ToArray()[selectedItemIndex - 1];
                 }
             }
         }

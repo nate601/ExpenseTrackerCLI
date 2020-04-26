@@ -57,7 +57,7 @@ namespace expenseTrackerCli
                 for (var i = 0; i < currentPage.Count(); i++)
                 {
                     var k = currentPage[i];
-                    Console.WriteLine($"|{i + 1,5:d2}|{k.Wic,6:d6}|{k.ItemName,-17}|{(k.twoWeekCycle ? 2 : 1 ),5:d2}|");
+                    Console.WriteLine($"|{i + 1,5:d2}|{k.Wic,6:d6}|{k.ItemName,-17}|{(k.twoWeekCycle ? 2 : 1),5:d2}|");
                 }
                 var resp = AskUser("(n)ext page, (p)rev page, (q)uit, or press a number to edit.");
                 if (resp == "n")
@@ -68,10 +68,10 @@ namespace expenseTrackerCli
                 {
                     currentPageIndex--;
                 }
-		else if (resp == "q")
-		{
-		    return;
-		}
+                else if (resp == "q")
+                {
+                    return;
+                }
                 else if (int.TryParse(resp, out var selectedItemIndex)
                          && selectedItemIndex > 0
                          && selectedItemIndex <= currentPage.Count())
@@ -312,6 +312,7 @@ namespace expenseTrackerCli
             Console.Write($"{prompt}: ");
             return Console.ReadLine();
         }
+
         private static int AskUserNumber(string prompt)
         {
             while (true)

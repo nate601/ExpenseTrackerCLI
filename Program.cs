@@ -19,11 +19,11 @@ namespace expenseTrackerCli
                 switch (Console.ReadLine())
                 {
                     case "1":
-                        //Add New Orderable	
+                        // Add New Orderable
                         OrderablePrompt(db);
                         break;
                     case "2":
-                        //Add New Order
+                        // Add New Order
                         OrderPrompt(db);
                         break;
                     case "3":
@@ -128,11 +128,11 @@ namespace expenseTrackerCli
             OrderableItem[] orderableItems = db.GetOrderables();
             ExpenseOrder order = new ExpenseOrder
             {
-                OrderDate = new DateTime(AskUserNumber("Year"),
-                                           AskUserNumber("Month"),
-                                           AskUserNumber("Day"))
+                OrderDate = new DateTime(
+                    AskUserNumber("Year"),
+                    AskUserNumber("Month"),
+                    AskUserNumber("Day")),
             };
-            //order.OrderDate = DateTime.Now;
             int daysUntilThursday = ((int)DayOfWeek.Thursday - (int)order.OrderDate.DayOfWeek + 7) % 7;
             order.ExpectedDateOneCycle = order.OrderDate.AddDays(daysUntilThursday);
             order.ExpectedDateTwoCycle = order.ExpectedDateOneCycle.AddDays(7);
@@ -178,43 +178,43 @@ namespace expenseTrackerCli
                 }
                 else if (resp == "s")
                 {
-                    foreach (var k in new Dictionary<int, int>()
+                    foreach (KeyValuePair<int, int> k in new Dictionary<int, int>()
             {
-                {957754, 3},
-                {828188, 4},
-                {829838, 4},
-                {829839, 1},
-                {829841, 1},
-                {962843, 8},
-                {958293, 5},
-                {964586, 2},
-                {958292, 1},
-                {964588, 1},
-                {475071, 1},
-                {475070, 1},
-                {475069, 1},
-                {475068, 1},
-                {475067, 1},
-                {475066, 1},
-                {475065, 1},
-                {959737, 1},
-                {958843, 1},
-        {345150, 3},
-        {963233, 4},
-        {216735, 1},
-        {219561, 1},
-        {225610, 3},
-        {964880, 3},
-        {961510, 3},
-        {274002, 1},
-        {151913, 1},
-        {957507, 1}
+                { 957754, 3 },
+                { 828188, 4 },
+                { 829838, 4 },
+                { 829839, 1 },
+                { 829841, 1 },
+                { 962843, 8 },
+                { 958293, 5 },
+                { 964586, 2 },
+                { 958292, 1 },
+                { 964588, 1 },
+                { 475071, 1 },
+                { 475070, 1 },
+                { 475069, 1 },
+                { 475068, 1 },
+                { 475067, 1 },
+                { 475066, 1 },
+                { 475065, 1 },
+                { 959737, 1 },
+                { 958843, 1 },
+                { 345150, 3 },
+                { 963233, 4 },
+                { 216735, 1 },
+                { 219561, 1 },
+                { 225610, 3 },
+                { 964880, 3 },
+                { 961510, 3 },
+                { 274002, 1 },
+                { 151913, 1 },
+                { 957507, 1 },
             }
                     .Where(k => orderableItems.Any((x) => x.Wic == k.Key)))
                     {
-                        var item = orderableItems.First((x) => x.Wic == k.Key);
+                        OrderableItem item = orderableItems.First((x) => x.Wic == k.Key);
                         Console.WriteLine($"{item.Wic} : {item.ItemName}");
-                        var onHand = AskUserNumber("On Hand");
+                        int onHand = AskUserNumber("On Hand");
                         int orderThis = onHand < k.Value ? k.Value - onHand : 0;
                         Console.WriteLine("Suggested on hand value should be " + k.Value);
                         if (orderThis != 0)
@@ -240,8 +240,8 @@ namespace expenseTrackerCli
                 }
             }
             db.SaveNewOrder(order);
-
         }
+
         private static void DisplayOrderPreorder(Database.ExpenseOrder order)
         {
             Console.Clear();
@@ -258,6 +258,7 @@ namespace expenseTrackerCli
             }
             Console.WriteLine();
         }
+
         private static void DisplayOrderResolve(Database.ExpenseOrder order)
         {
             Console.Clear();

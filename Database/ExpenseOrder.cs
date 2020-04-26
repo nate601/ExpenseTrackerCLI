@@ -71,7 +71,7 @@ namespace expenseTrackerCli.Database
             ExpectedDateOneCycle = expectedDateOneCycle;
             ExpectedDateTwoCycle = expectedDateTwoCycle;
             this.orderedItems = orderedItems;
-	    resolution = new ItemResolution(false, null);
+            resolution = new ItemResolution(false, null);
         }
     }
     [Serializable]

@@ -81,7 +81,7 @@ namespace expenseTrackerCli
                 }
                 else if (int.TryParse(resp, out var selectedItemIndex)
                          && selectedItemIndex > 0
-                         && selectedItemIndex <= currentPage.Count())
+                         && selectedItemIndex <= currentPage.Length)
                 {
                     OrderableItem selectedItem = currentPage.ToArray()[selectedItemIndex - 1];
                     int oldWic = selectedItem.Wic;

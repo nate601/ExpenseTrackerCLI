@@ -40,7 +40,7 @@ namespace expenseTrackerCli
         {
             var orderables = db.GetOrderables().OrderBy((x) => x.Wic).ToArray();
 
-            int numberPerPage = 5;
+            const int numberPerPage = 5;
             int numberOfPages = orderables.Length / numberPerPage;
             int currentPageIndex = 0;
 

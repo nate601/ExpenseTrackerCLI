@@ -58,10 +58,10 @@ namespace expenseTrackerCli
 
                 Console.Clear();
                 OrderableItem[] currentPage = orderables.Skip(currentPageIndex * numberPerPage).Take(numberPerPage).ToArray();
-                Console.WriteLine($"Displaying {currentPage.Count()} of {orderables.Length} items. Page {currentPageIndex + 1} / {numberOfPages + 1 }.");
+                Console.WriteLine($"Displaying {currentPage.Length} of {orderables.Length} items. Page {currentPageIndex + 1} / {numberOfPages + 1 }.");
                 Console.WriteLine();
                 Console.WriteLine($"|Index|Wic   |Name             |Cycle|");
-                for (int i = 0; i < currentPage.Count(); i++)
+                for (int i = 0; i < currentPage.Length; i++)
                 {
                     OrderableItem k = currentPage[i];
                     Console.WriteLine($"|{i + 1,5:d2}|{k.Wic,6:d6}|{k.ItemName,-17}|{(k.twoWeekCycle ? 2 : 1),5:d2}|");

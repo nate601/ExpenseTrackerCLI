@@ -5,9 +5,9 @@ using expenseTrackerCli.Database;
 
 namespace expenseTrackerCli
 {
-    class Program
+    internal static class Program
     {
-        static void Main(string[] args)
+        private static void Main()
         {
             while (true)
             {
@@ -16,19 +16,18 @@ namespace expenseTrackerCli
                 Console.WriteLine("1: Add new Orderable");
                 Console.WriteLine("2: Add new Order");
                 Console.WriteLine("3: Edit orderable database");
-                var userSelection = Console.ReadLine();
-                switch (userSelection)
+                switch (Console.ReadLine())
                 {
                     case "1":
                         //Add New Orderable	
-                        orderablePrompt(db);
+                        OrderablePrompt(db);
                         break;
                     case "2":
                         //Add New Order
-                        orderPrompt(db);
+                        OrderPrompt(db);
                         break;
                     case "3":
-                        displayOrderables(db);
+                        DisplayOrderables(db);
                         break;
                     default:
                         Console.WriteLine("Invalid Entry");
@@ -37,7 +36,7 @@ namespace expenseTrackerCli
             }
         }
 
-        private static void displayOrderables(Database.Database db)
+        private static void DisplayOrderables(Database.Database db)
         {
             var orderables = db.GetOrderables().OrderBy((x) => x.Wic).ToArray();
 
@@ -47,19 +46,27 @@ namespace expenseTrackerCli
 
             while (true)
             {
-                if (currentPageIndex < 0) currentPageIndex = 0;
-                if (currentPageIndex > numberOfPages) currentPageIndex = numberOfPages;
+                if (currentPageIndex < 0)
+                {
+                    currentPageIndex = 0;
+                }
+
+                if (currentPageIndex > numberOfPages)
+                {
+                    currentPageIndex = numberOfPages;
+                }
+
                 Console.Clear();
-                var currentPage = orderables.Skip((currentPageIndex) * numberPerPage).Take(numberPerPage).ToArray();
+                OrderableItem[] currentPage = orderables.Skip(currentPageIndex * numberPerPage).Take(numberPerPage).ToArray();
                 Console.WriteLine($"Displaying {currentPage.Count()} of {orderables.Length} items. Page {currentPageIndex + 1} / {numberOfPages + 1 }.");
                 Console.WriteLine();
                 Console.WriteLine($"|Index|Wic   |Name             |Cycle|");
-                for (var i = 0; i < currentPage.Count(); i++)
+                for (int i = 0; i < currentPage.Count(); i++)
                 {
-                    var k = currentPage[i];
+                    OrderableItem k = currentPage[i];
                     Console.WriteLine($"|{i + 1,5:d2}|{k.Wic,6:d6}|{k.ItemName,-17}|{(k.twoWeekCycle ? 2 : 1),5:d2}|");
                 }
-                var resp = AskUser("(n)ext page, (p)rev page, (q)uit, or press a number to edit.");
+                string resp = AskUser("(n)ext page, (p)rev page, (q)uit, or press a number to edit.");
                 if (resp == "n")
                 {
                     currentPageIndex++;
@@ -76,8 +83,8 @@ namespace expenseTrackerCli
                          && selectedItemIndex > 0
                          && selectedItemIndex <= currentPage.Count())
                 {
-                    var selectedItem = currentPage.ToArray()[selectedItemIndex - 1];
-                    var oldWic = selectedItem.Wic;
+                    OrderableItem selectedItem = currentPage.ToArray()[selectedItemIndex - 1];
+                    int oldWic = selectedItem.Wic;
                     while (true)
                     {
                         resp = AskUser("(d)elete, (c)hange wic, change (n)ame, change c(y)cle, (f)inish)");
@@ -99,15 +106,15 @@ namespace expenseTrackerCli
                             case "f":
                                 goto finishEdit;
                             default:
+                                Console.WriteLine("Invalid command");
                                 break;
                         }
                     }
                 finishEdit:
                     IEnumerable<OrderableItem> newOrderables;
-                    if (selectedItem != null)
-                        newOrderables = orderables.Where((x) => x.Wic != oldWic).Append(selectedItem);
-                    else
-                        newOrderables = orderables.Where((x) => x.Wic != oldWic);
+                    newOrderables = selectedItem != null
+                        ? orderables.Where((x) => x.Wic != oldWic).Append(selectedItem)
+                        : orderables.Where((x) => x.Wic != oldWic);
                     db.OverwriteOrderableItems(newOrderables.ToArray());
                     orderables = db.GetOrderables().OrderBy((x) => x.Wic).ToArray();
                     numberOfPages = orderables.Length / numberPerPage;
@@ -115,23 +122,25 @@ namespace expenseTrackerCli
             }
         }
 
-        private static void orderPrompt(Database.Database db)
+        private static void OrderPrompt(Database.Database db)
         {
 
-            var orderableItems = db.GetOrderables();
-            Database.ExpenseOrder order = new Database.ExpenseOrder();
-            order.OrderDate = new DateTime(AskUserNumber("Year"),
+            OrderableItem[] orderableItems = db.GetOrderables();
+            ExpenseOrder order = new ExpenseOrder
+            {
+                OrderDate = new DateTime(AskUserNumber("Year"),
                                            AskUserNumber("Month"),
-                                           AskUserNumber("Day"));
+                                           AskUserNumber("Day"))
+            };
             //order.OrderDate = DateTime.Now;
             int daysUntilThursday = ((int)DayOfWeek.Thursday - (int)order.OrderDate.DayOfWeek + 7) % 7;
             order.ExpectedDateOneCycle = order.OrderDate.AddDays(daysUntilThursday);
             order.ExpectedDateTwoCycle = order.ExpectedDateOneCycle.AddDays(7);
 
-            order.orderedItems = new Dictionary<Database.OrderableItem, Database.OrderedItemInfo>();
+            order.orderedItems = new Dictionary<OrderableItem, OrderedItemInfo>();
             while (true)
             {
-                displayOrderPreorder(order);
+                DisplayOrderPreorder(order);
                 Console.WriteLine("Add item by (w)ic, or search by (n)ame.");
                 Console.WriteLine("(s)uggested Order");
                 Console.WriteLine("(f)inish order");
@@ -144,7 +153,7 @@ namespace expenseTrackerCli
                         if (order.orderedItems.ContainsKey(orderableItems.First((x) => x.Wic == wic)))
                         {
                             Console.WriteLine("That item is already in the order.");
-                            Database.OrderedItemInfo oldItem = order.orderedItems.First((x) => x.Key.Wic == wic).Value;
+                            OrderedItemInfo oldItem = order.orderedItems.First((x) => x.Key.Wic == wic).Value;
                             oldItem.onHand = AskUserNumber($"Modify on hand amount ({oldItem.onHand})");
                             oldItem.orderedAmount = AskUserNumber($"Modify ordered amount ({oldItem.orderedAmount})");
                         }
@@ -158,9 +167,8 @@ namespace expenseTrackerCli
                         Console.WriteLine("Invalid Wic");
                         if (AskUserBool("Add new item?"))
                         {
-                            orderablePrompt(db);
+                            OrderablePrompt(db);
                             orderableItems = db.GetOrderables();
-                            continue;
                         }
                     }
                 }
@@ -207,13 +215,7 @@ namespace expenseTrackerCli
                         var item = orderableItems.First((x) => x.Wic == k.Key);
                         Console.WriteLine($"{item.Wic} : {item.ItemName}");
                         var onHand = AskUserNumber("On Hand");
-                        int orderThis;
-                        if (onHand < k.Value)
-                        {
-                            orderThis = k.Value - onHand;
-                        }
-                        else { orderThis = 0; }
-
+                        int orderThis = onHand < k.Value ? k.Value - onHand : 0;
                         Console.WriteLine("Suggested on hand value should be " + k.Value);
                         if (orderThis != 0)
                         {
@@ -226,16 +228,13 @@ namespace expenseTrackerCli
                                 order.orderedItems.Add(item, new Database.OrderedItemInfo(onHand, orderThis));
                             }
                         }
+                        else if (AskUserBool("Current amount is sufficient. Order more?"))
+                        {
+                            order.orderedItems.Add(item, new Database.OrderedItemInfo(onHand, AskUserNumber("Quantity")));
+                        }
                         else
                         {
-                            if (AskUserBool("Current amount is sufficient. Order more?"))
-                            {
-                                order.orderedItems.Add(item, new Database.OrderedItemInfo(onHand, AskUserNumber("Quantity")));
-                            }
-                            else
-                            {
-                                order.orderedItems.Add(item, new Database.OrderedItemInfo(onHand, 0));
-                            }
+                            order.orderedItems.Add(item, new Database.OrderedItemInfo(onHand, 0));
                         }
                     }
                 }
@@ -243,7 +242,7 @@ namespace expenseTrackerCli
             db.SaveNewOrder(order);
 
         }
-        private static void displayOrderPreorder(Database.ExpenseOrder order)
+        private static void DisplayOrderPreorder(Database.ExpenseOrder order)
         {
             Console.Clear();
             Console.WriteLine($"Order for {order.OrderDate.ToShortDateString()}");
@@ -259,7 +258,7 @@ namespace expenseTrackerCli
             }
             Console.WriteLine();
         }
-        private static void displayOrderResolve(Database.ExpenseOrder order)
+        private static void DisplayOrderResolve(Database.ExpenseOrder order)
         {
             Console.Clear();
             Console.WriteLine($"Order for {order.OrderDate.ToShortDateString()}");
@@ -276,7 +275,7 @@ namespace expenseTrackerCli
             Console.WriteLine();
         }
 
-        private static void orderablePrompt(Database.Database db)
+        private static void OrderablePrompt(Database.Database db)
         {
             Database.OrderableItem item = new Database.OrderableItem(
                 AskUserNumber("Wic"),

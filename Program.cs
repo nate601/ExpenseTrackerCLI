@@ -112,9 +112,9 @@ namespace expenseTrackerCli
                     }
                 finishEdit:
                     IEnumerable<OrderableItem> newOrderables;
-                    newOrderables = selectedItem != null
-                        ? orderables.Where((x) => x.Wic != oldWic).Append(selectedItem)
-                        : orderables.Where((x) => x.Wic != oldWic);
+                    newOrderables = selectedItem == null
+                        ? orderables.Where((x) => x.Wic != oldWic)
+                        : orderables.Where((x) => x.Wic != oldWic).Append(selectedItem);
                     db.OverwriteOrderableItems(newOrderables.ToArray());
                     orderables = db.GetOrderables().OrderBy((x) => x.Wic).ToArray();
                     numberOfPages = orderables.Length / numberPerPage;

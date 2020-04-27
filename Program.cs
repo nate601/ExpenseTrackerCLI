@@ -61,12 +61,14 @@ namespace expenseTrackerCli
                 Console.WriteLine($"Displaying {currentPage.Length} of {orderables.Length} items. Page {currentPageIndex + 1} / {numberOfPages + 1 }.");
                 Console.WriteLine();
                 Console.WriteLine($"|Index|Wic   |Name             |Cycle|");
+
                 for (int i = 0; i < currentPage.Length; i++)
                 {
                     OrderableItem k = currentPage[i];
                     Console.WriteLine($"|{i + 1,5:d2}|{k.Wic,6:d6}|{k.ItemName,-17}|{(k.twoWeekCycle ? 2 : 1),5:d2}|");
                 }
                 string resp = AskUser("(n)ext page, (p)rev page, (q)uit, or press a number to edit.");
+
                 if (resp == "n")
                 {
                     currentPageIndex++;

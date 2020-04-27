@@ -38,7 +38,7 @@ namespace expenseTrackerCli
 
         private static void DisplayOrderables(Database.Database db)
         {
-            var orderables = db.GetOrderables().OrderBy((x) => x.Wic).ToArray();
+            OrderableItem[] orderables = db.GetOrderables().OrderBy((x) => x.Wic).ToArray();
 
             const int numberPerPage = 5;
             int numberOfPages = orderables.Length / numberPerPage;
@@ -79,7 +79,7 @@ namespace expenseTrackerCli
                 {
                     return;
                 }
-                else if (int.TryParse(resp, out var selectedItemIndex)
+                else if (int.TryParse(resp, out int selectedItemIndex)
                          && selectedItemIndex > 0
                          && selectedItemIndex <= currentPage.Length)
                 {

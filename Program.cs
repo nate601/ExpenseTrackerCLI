@@ -223,20 +223,20 @@ namespace expenseTrackerCli
                         {
                             if (!AskUserBool("Order this amount? (" + orderThis + ")"))
                             {
-                                order.orderedItems.Add(item, new Database.OrderedItemInfo(onHand, AskUserNumber("Quantity")));
+                                order.orderedItems.Add(item, new OrderedItemInfo(onHand, AskUserNumber("Quantity")));
                             }
                             else
                             {
-                                order.orderedItems.Add(item, new Database.OrderedItemInfo(onHand, orderThis));
+                                order.orderedItems.Add(item, new OrderedItemInfo(onHand, orderThis));
                             }
                         }
                         else if (AskUserBool("Current amount is sufficient. Order more?"))
                         {
-                            order.orderedItems.Add(item, new Database.OrderedItemInfo(onHand, AskUserNumber("Quantity")));
+                            order.orderedItems.Add(item, new OrderedItemInfo(onHand, AskUserNumber("Quantity")));
                         }
                         else
                         {
-                            order.orderedItems.Add(item, new Database.OrderedItemInfo(onHand, 0));
+                            order.orderedItems.Add(item, new OrderedItemInfo(onHand, 0));
                         }
                     }
                 }
@@ -244,7 +244,7 @@ namespace expenseTrackerCli
             db.SaveNewOrder(order);
         }
 
-        private static void DisplayOrderPreorder(Database.ExpenseOrder order)
+        private static void DisplayOrderPreorder(ExpenseOrder order)
         {
             Console.Clear();
             Console.WriteLine($"Order for {order.OrderDate.ToShortDateString()}");
@@ -254,7 +254,7 @@ namespace expenseTrackerCli
             Console.WriteLine();
             Console.WriteLine($"|Wic   |Item Name      |On Hand|Ordered|");
             Console.WriteLine();
-            foreach (var s in order.orderedItems)
+            foreach (KeyValuePair<OrderableItem, OrderedItemInfo> s in order.orderedItems)
             {
                 Console.WriteLine($"|{s.Key.Wic,6:d6}|{s.Key.ItemName,-15}|{s.Value.onHand,7:d3}|{s.Value.orderedAmount,7:d3}|");
             }
@@ -271,7 +271,7 @@ namespace expenseTrackerCli
             Console.WriteLine();
             Console.WriteLine($"|Wic   |Item Name      |On Hand|Ordered|New On Hand|Recieved|Deficit|");
             Console.WriteLine();
-            foreach (var s in order.orderedItems)
+            foreach (KeyValuePair<OrderableItem, OrderedItemInfo> s in order.orderedItems)
             {
                 Console.WriteLine($"|{s.Key.Wic,6:d6}|{s.Key.ItemName,-15}|{s.Value.onHand,7:d3}|{s.Value.orderedAmount,7:d3}|");
             }
@@ -280,12 +280,11 @@ namespace expenseTrackerCli
 
         private static void OrderablePrompt(Database.Database db)
         {
-            Database.OrderableItem item = new Database.OrderableItem(
+            OrderableItem item = new OrderableItem(
                 AskUserNumber("Wic"),
                 AskUser("Item Name"),
                 AskUserNumber("Package Size"),
-                AskUserBool("Two Week Cycle")
-                );
+                AskUserBool("Two Week Cycle"));
             db.SaveNewOrderableItem(item);
         }
 

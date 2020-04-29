@@ -7,6 +7,44 @@ namespace expenseTrackerCli
 {
     internal static class Program
     {
+        public static bool AskUserBool(string v)
+        {
+            while (true)
+            {
+                var resp = AskUser($"{v} (true/false) or (1/0)");
+                if (resp == "0")
+                {
+                    return false;
+                }
+                else if (resp == "1")
+                {
+                    return true;
+                }
+                if (bool.TryParse(resp, out var result))
+                {
+                    return result;
+                }
+            }
+        }
+
+        public static string AskUser(string prompt)
+        {
+            Console.Write($"{prompt}: ");
+            return Console.ReadLine();
+        }
+
+        public static int AskUserNumber(string prompt)
+        {
+            while (true)
+            {
+                var resp = AskUser(prompt);
+                if (int.TryParse(resp, out var k))
+                {
+                    return k;
+                }
+            }
+        }
+
         private static void Main()
         {
             while (true)
@@ -27,7 +65,7 @@ namespace expenseTrackerCli
                         OrderPrompt(db);
                         break;
                     case "3":
-                        DisplayOrderables(db);
+                        OrderableManagement.DisplayOrderables(db);
                         break;
                     default:
                         Console.WriteLine("Invalid Entry");
@@ -36,93 +74,6 @@ namespace expenseTrackerCli
             }
         }
 
-        private static void DisplayOrderables(Database.Database db)
-        {
-            OrderableItem[] orderables = db.GetOrderables().OrderBy((x) => x.Wic).ToArray();
-
-            const int numberPerPage = 5;
-            int numberOfPages = orderables.Length / numberPerPage;
-            int currentPageIndex = 0;
-
-            while (true)
-            {
-                if (currentPageIndex < 0)
-                {
-                    currentPageIndex = 0;
-                }
-
-                if (currentPageIndex > numberOfPages)
-                {
-                    currentPageIndex = numberOfPages;
-                }
-
-                Console.Clear();
-                OrderableItem[] currentPage = orderables.Skip(currentPageIndex * numberPerPage).Take(numberPerPage).ToArray();
-                Console.WriteLine($"Displaying {currentPage.Length} of {orderables.Length} items. Page {currentPageIndex + 1} / {numberOfPages + 1 }.");
-                Console.WriteLine();
-                Console.WriteLine($"|Index|Wic   |Name             |Cycle|");
-
-                for (int i = 0; i < currentPage.Length; i++)
-                {
-                    OrderableItem k = currentPage[i];
-                    Console.WriteLine($"|{i + 1,5:d2}|{k.Wic,6:d6}|{k.ItemName,-17}|{(k.twoWeekCycle ? 2 : 1),5:d2}|");
-                }
-                string resp = AskUser("(n)ext page, (p)rev page, (q)uit, or press a number to edit.");
-
-                if (resp == "n")
-                {
-                    currentPageIndex++;
-                }
-                else if (resp == "p")
-                {
-                    currentPageIndex--;
-                }
-                else if (resp == "q")
-                {
-                    return;
-                }
-                else if (int.TryParse(resp, out int selectedItemIndex)
-                         && selectedItemIndex > 0
-                         && selectedItemIndex <= currentPage.Length)
-                {
-                    OrderableItem selectedItem = currentPage.ToArray()[selectedItemIndex - 1];
-                    int oldWic = selectedItem.Wic;
-                    while (true)
-                    {
-                        resp = AskUser("(d)elete, (c)hange wic, change (n)ame, change c(y)cle, (f)inish)");
-
-                        switch (resp)
-                        {
-                            case "d":
-                                selectedItem = null;
-                                goto finishEdit;
-                            case "c":
-                                selectedItem.Wic = int.Parse(new string(AskUserNumber("New wic?").ToString().ToArray().Take(6).ToArray()));
-                                goto finishEdit;
-                            case "n":
-                                selectedItem.ItemName = AskUser("New name?");
-                                goto finishEdit;
-                            case "y":
-                                selectedItem.twoWeekCycle = !selectedItem.twoWeekCycle;
-                                goto finishEdit;
-                            case "f":
-                                goto finishEdit;
-                            default:
-                                Console.WriteLine("Invalid command");
-                                break;
-                        }
-                    }
-                finishEdit:
-                    IEnumerable<OrderableItem> newOrderables;
-                    newOrderables = selectedItem == null
-                        ? orderables.Where((x) => x.Wic != oldWic)
-                        : orderables.Where((x) => x.Wic != oldWic).Append(selectedItem);
-                    db.OverwriteOrderableItems(newOrderables.ToArray());
-                    orderables = db.GetOrderables().OrderBy((x) => x.Wic).ToArray();
-                    numberOfPages = orderables.Length / numberPerPage;
-                }
-            }
-        }
 
         private static void OrderPrompt(Database.Database db)
         {
@@ -288,42 +239,5 @@ namespace expenseTrackerCli
             db.SaveNewOrderableItem(item);
         }
 
-        private static bool AskUserBool(string v)
-        {
-            while (true)
-            {
-                var resp = AskUser($"{v} (true/false) or (1/0)");
-                if (resp == "0")
-                {
-                    return false;
-                }
-                else if (resp == "1")
-                {
-                    return true;
-                }
-                if (bool.TryParse(resp, out var result))
-                {
-                    return result;
-                }
-            }
-        }
-
-        private static string AskUser(string prompt)
-        {
-            Console.Write($"{prompt}: ");
-            return Console.ReadLine();
-        }
-
-        private static int AskUserNumber(string prompt)
-        {
-            while (true)
-            {
-                var resp = AskUser(prompt);
-                if (int.TryParse(resp, out var k))
-                {
-                    return k;
-                }
-            }
-        }
     }
 }

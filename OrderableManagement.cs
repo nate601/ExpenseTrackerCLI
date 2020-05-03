@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using expenseTrackerCli.Database;
+using static expenseTrackerCli.ConsoleUtilities;
 
 namespace expenseTrackerCli
 {
@@ -39,7 +40,7 @@ namespace expenseTrackerCli
                     OrderableItem k = currentPage[i];
                     Console.WriteLine($"|{i + 1,5:d2}|{k.Wic,6:d6}|{k.ItemName,-17}|{(k.twoWeekCycle ? 2 : 1),5:d2}|");
                 }
-                string resp = Program.AskUser("(n)ext page, (p)rev page, (q)uit, or press a number to edit.");
+                string resp = AskUser("(n)ext page, (p)rev page, (q)uit, or press a number to edit.");
 
                 if (resp == "n")
                 {
@@ -61,7 +62,7 @@ namespace expenseTrackerCli
                     int oldWic = selectedItem.Wic;
                     while (true)
                     {
-                        resp = Program.AskUser("(d)elete, (c)hange wic, change (n)ame, change c(y)cle, (f)inish)");
+                        resp = AskUser("(d)elete, (c)hange wic, change (n)ame, change c(y)cle, (f)inish)");
 
                         switch (resp)
                         {
@@ -69,10 +70,10 @@ namespace expenseTrackerCli
                                 selectedItem = null;
                                 goto finishEdit;
                             case "c":
-                                selectedItem.Wic = int.Parse(new string(Program.AskUserNumber("New wic?").ToString().ToArray().Take(6).ToArray()));
+                                selectedItem.Wic = int.Parse(new string(AskUserNumber("New wic?").ToString().ToArray().Take(6).ToArray()));
                                 goto finishEdit;
                             case "n":
-                                selectedItem.ItemName = Program.AskUser("New name?");
+                                selectedItem.ItemName = AskUser("New name?");
                                 goto finishEdit;
                             case "y":
                                 selectedItem.twoWeekCycle = !selectedItem.twoWeekCycle;

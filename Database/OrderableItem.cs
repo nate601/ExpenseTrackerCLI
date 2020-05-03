@@ -8,24 +8,27 @@ namespace expenseTrackerCli.Database
 {
     public partial class Database
     {
-	public OrderableItem[] GetOrderables()
-	{
-	    if(!File.Exists("orderable.dat"))
-	    {
-		return new List<OrderableItem>().ToArray();
-	    }
-	    BinaryFormatter formatter = new BinaryFormatter();
-	    FileStream fs = File.Open("orderable.dat", FileMode.Open);
-	    object obj = formatter.Deserialize(fs);
-	    fs.Flush();
-	    fs.Close();
-	    fs.Dispose();
-	    return CleanOrderableItems((OrderableItem[])obj);
-	}
-        public void SaveNewOrderableItem(OrderableItem item) => SaveNew<OrderableItem>(item,
-            GetOrderables(),
-            "orderable.dat");
-
+        public OrderableItem[] GetOrderables()
+        {
+            if (!File.Exists("orderable.dat"))
+            {
+                return new List<OrderableItem>().ToArray();
+            }
+            BinaryFormatter formatter = new BinaryFormatter();
+            FileStream fs = File.Open("orderable.dat", FileMode.Open);
+            object obj = formatter.Deserialize(fs);
+            fs.Flush();
+            fs.Close();
+            fs.Dispose();
+            return this.CleanOrderableItems((OrderableItem[])obj);
+        }
+        public void SaveNewOrderableItem(OrderableItem item)
+        {
+            _ = SaveNew(
+                item,
+                this.GetOrderables(),
+                "orderable.dat");
+        }
         public void OverwriteOrderableItems(OrderableItem[] items)
         {
             BinaryFormatter formatter = new BinaryFormatter();
@@ -36,30 +39,33 @@ namespace expenseTrackerCli.Database
             ms.Close();
             ms.Dispose();
         }
-	public OrderableItem[] CleanOrderableItems(OrderableItem[] items)
-	{
-	    var retVal = items.ToList();
-	    foreach(var item in items)
-	    {
-		if(items.Where(x=>x.Wic == item.Wic).Count() > 1)
-		{
-		   retVal.Remove(retVal.First(x=>x.Wic == item.Wic)); 
-		}
-	    }
-	    return retVal.ToArray();
-	}
+        public OrderableItem[] CleanOrderableItems(OrderableItem[] items)
+        {
+            var retVal = items.ToList();
+            foreach (var item in items)
+            {
+                if (items.Count(x => x.Wic == item.Wic) > 1)
+                {
+                    _ = retVal.Remove(retVal.First(x => x.Wic == item.Wic));
+                }
+            }
+            return retVal.ToArray();
+        }
     }
+
     [Serializable]
     public class OrderableItem
     {
-	public int Wic;
-	public string ItemName;
-	public int PackageSize;
-	public bool twoWeekCycle;
-	public int onHandAmount;
+        public int Wic;
+        public string ItemName;
+        public int PackageSize;
+        public bool twoWeekCycle;
+        public int onHandAmount;
+
         public OrderableItem()
         {
         }
+
         public OrderableItem(int wic, string itemName, int packageSize, bool twoWeekCycle)
         {
             Wic = wic;

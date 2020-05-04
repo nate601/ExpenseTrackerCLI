@@ -15,6 +15,11 @@ namespace expenseTrackerCli
                 AskUser("Item Name"),
                 AskUserNumber("Package Size"),
                 AskUserBool("Two Week Cycle"));
+            if (db.GetOrderables().Any(x => x.Wic == item.Wic))
+            {
+                Console.WriteLine("Wic is not unique!!");
+                return;
+            }
             db.SaveNewOrderableItem(item);
         }
 

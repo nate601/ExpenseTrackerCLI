@@ -28,14 +28,11 @@ namespace expenseTrackerCli
                 AskUser("Item Name"),
                 AskUserNumber("Package Size"),
                 AskUserBool("Two Week Cycle"));
-            if (isOrderableValid)
-            {
-                db.SaveNewOrderableItem(item);
-            }
-            else
+            if (!isOrderableValid)
             {
                 Console.WriteLine("Unable to save. Item is invalid!");
             }
+            db.SaveNewOrderableItem(item);
         }
 
         internal static void OrderPrompt(Database.Database db)

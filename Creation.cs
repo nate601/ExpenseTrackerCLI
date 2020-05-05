@@ -10,17 +10,32 @@ namespace expenseTrackerCli
     {
         internal static void OrderablePrompt(Database.Database db)
         {
+            OrderableItem[] currentOrders = db.GetOrderables();
+            bool isOrderableValid = true;
+            int AskValidWic()
+            {
+                var newWic = AskUserNumber("Wic");
+                if (currentOrders.Any(x => x.Wic == newWic))
+                {
+                    Console.WriteLine("Wic is not unique!");
+                    isOrderableValid = false;
+                }
+                return newWic;
+            }
+
             OrderableItem item = new OrderableItem(
-                AskUserNumber("Wic"),
+                AskValidWic(),
                 AskUser("Item Name"),
                 AskUserNumber("Package Size"),
                 AskUserBool("Two Week Cycle"));
-            if (db.GetOrderables().Any(x => x.Wic == item.Wic))
+            if (isOrderableValid)
             {
-                Console.WriteLine("Wic is not unique!!");
-                return;
+                db.SaveNewOrderableItem(item);
             }
-            db.SaveNewOrderableItem(item);
+            else
+            {
+                Console.WriteLine("Unable to save. Item is invalid!");
+            }
         }
 
         internal static void OrderPrompt(Database.Database db)

@@ -31,6 +31,10 @@ namespace expenseTrackerCli
                     case "3":
                         OrderableManagement.DisplayOrderables(db);
                         break;
+                    case "4":
+                        var order = OrderManagement.ChooseOrder(db);
+			
+                        break;
                     default:
                         Console.WriteLine("Invalid Entry");
                         break;

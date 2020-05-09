@@ -45,5 +45,21 @@ namespace expenseTrackerCli
             }
         }
 
+        public static void DisplayOrderPreorder(ExpenseOrder order)
+        {
+            Console.Clear();
+            Console.WriteLine($"Order for {order.OrderDate.ToShortDateString()}");
+            Console.WriteLine($"Expected Arrival {order.ExpectedDateOneCycle.ToShortDateString(),6} ({order.ExpectedDateTwoCycle.ToShortDateString():d2})");
+            Console.WriteLine();
+            Console.WriteLine("Items: ");
+            Console.WriteLine();
+            Console.WriteLine($"|Wic   |Item Name      |On Hand|Ordered|");
+            Console.WriteLine();
+            foreach (KeyValuePair<OrderableItem, OrderedItemInfo> s in order.orderedItems)
+            {
+                Console.WriteLine($"|{s.Key.Wic,6:d6}|{s.Key.ItemName,-15}|{s.Value.onHand,7:d3}|{s.Value.orderedAmount,7:d3}|");
+            }
+            Console.WriteLine();
+        }
     }
 }

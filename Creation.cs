@@ -154,6 +154,5 @@ namespace expenseTrackerCli
             }
             db.SaveNewOrder(order);
         }
-
     }
 }

@@ -4,7 +4,6 @@ namespace expenseTrackerCli
 {
     internal static class Program
     {
-
         private static void Main()
         {
             while (true)

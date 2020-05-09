@@ -37,8 +37,8 @@ namespace expenseTrackerCli
         {
             while (true)
             {
-                var resp = AskUser(prompt);
-                if (int.TryParse(resp, out var k))
+                string resp = AskUser(prompt);
+                if (int.TryParse(resp, out int k))
                 {
                     return k;
                 }

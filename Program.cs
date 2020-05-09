@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using expenseTrackerCli.Database;
-using static expenseTrackerCli.ConsoleUtilities;
 
 namespace expenseTrackerCli
 {

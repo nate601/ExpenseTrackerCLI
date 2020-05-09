@@ -33,8 +33,10 @@ namespace expenseTrackerCli
                         break;
                     case "4":
                         var order = OrderManagement.ChooseOrder(db);
-			Console.WriteLine($"{order.OrderDate.ToShortDateString()}");
-
+                        if (!(order is null))
+                        {
+                            Console.WriteLine($"{order.OrderDate.ToShortDateString()}");
+                        }
                         break;
                     default:
                         Console.WriteLine("Invalid Entry");
@@ -42,7 +44,5 @@ namespace expenseTrackerCli
                 }
             }
         }
-
-
     }
 }

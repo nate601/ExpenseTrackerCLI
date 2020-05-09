@@ -53,7 +53,7 @@ namespace expenseTrackerCli
             order.orderedItems = new Dictionary<OrderableItem, OrderedItemInfo>();
             while (true)
             {
-                Program.DisplayOrderPreorder(order);
+                DisplayOrderPreorder(order);
                 Console.WriteLine("Add item by (w)ic, or search by (n)ame.");
                 Console.WriteLine("(s)uggested Order");
                 Console.WriteLine("(f)inish order");

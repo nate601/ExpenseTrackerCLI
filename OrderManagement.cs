@@ -9,7 +9,6 @@ namespace expenseTrackerCli
 
         public static ExpenseOrder ChooseOrder(Database.Database db)
         {
-            ExpenseOrder retVal = null;
             if (db is null)
             {
                 throw new System.ArgumentNullException(nameof(db));
@@ -21,7 +20,9 @@ namespace expenseTrackerCli
             int numberOfPages = orders.Length / numberPerPage;
             int currentPageIndex = 0;
 
-            while (true)
+            ExpenseOrder retVal = null;
+
+            while (retVal == null)
             {
                 if (currentPageIndex < 0)
                 {
@@ -57,12 +58,16 @@ namespace expenseTrackerCli
                          && selectedItemIndex > 0
                          && selectedItemIndex <= currentPage.Length)
                 {
-                    return currentPage.ToArray()[selectedItemIndex - 1];
+                    retVal = currentPage.ToArray()[selectedItemIndex - 1];
+                    ConsoleUtilities.DisplayOrderPreorder(retVal);
+                    if (ConsoleUtilities.AskUserBool("Select this order?"))
+                    {
+                        return retVal;
+                    }
+                    retVal = null;
                 }
             }
-
+	    return null;
         }
-
-
     }
 }

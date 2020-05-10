@@ -14,12 +14,16 @@ namespace expenseTrackerCli
             {
                 Console.Clear();
                 ConsoleUtilities.DisplayOrderPreorder(order);
-                int resp = ConsoleUtilities.AskUserNumber("Choose Wic to edit.");
-                if (resp.ToString().Length != 6 || !orderItems.Any(x => x.Key.Wic == resp))
+                string resp = ConsoleUtilities.AskUser("Choose Wic to edit or (q)uit.");
+                if (resp == "q")
+                {
+                    break;
+                }
+                if (int.TryParse(resp, out int selectedWic) && (selectedWic.ToString().Length != 6 || !orderItems.Any(x => x.Key.Wic == selectedWic)))
                 {
                     continue;
                 }
-                KeyValuePair<OrderableItem, OrderedItemInfo> selectedItem = orderItems.First(x => x.Key.Wic == resp);
+                KeyValuePair<OrderableItem, OrderedItemInfo> selectedItem = orderItems.First(x => x.Key.Wic == selectedWic);
 
                 selectedItem.Value.onHand = ConsoleUtilities.AskUserNumber($"The previous order records {selectedItem.Value.onHand} items as being on hand.  New value = ?");
                 selectedItem.Value.orderedAmount = ConsoleUtilities.AskUserNumber($"The previous order records {selectedItem.Value.orderedAmount} items as being ordered.  New value = ?");
@@ -36,7 +40,7 @@ namespace expenseTrackerCli
             {
                 throw new ArgumentNullException(nameof(db));
             }
-            ExpenseOrder[] orders = db.GetOrders();
+            ExpenseOrder[] orders = db.GetOrders().OrderBy(x => x.OrderDate.ToFileTimeUtc()).ToArray();
             Console.Clear();
 
             const int numberPerPage = 5;

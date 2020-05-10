@@ -99,6 +99,7 @@ namespace expenseTrackerCli.Database
     public class OrderedItemInfo
     {
         public int onHand, orderedAmount;
+	public ItemResolution Resolution;
 
         public OrderedItemInfo(int onHand, int orderedAmount)
         {

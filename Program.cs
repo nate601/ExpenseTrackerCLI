@@ -13,6 +13,8 @@ namespace expenseTrackerCli
                 Console.WriteLine("1: Add new Orderable");
                 Console.WriteLine("2: Add new Order");
                 Console.WriteLine("3: Edit orderable database");
+                Console.WriteLine("4: Edit order");
+                Console.WriteLine("5: Receipt");
                 switch (Console.ReadLine())
                 {
                     case "1":
@@ -27,12 +29,15 @@ namespace expenseTrackerCli
                         OrderableManagement.DisplayOrderables(db);
                         break;
                     case "4":
-                        var order = OrderManagement.ChooseOrder(db);
-                        if (!(order is null))
+                        var editOrderOrder = OrderManagement.ChooseOrder(db);
+                        if (!(editOrderOrder is null))
                         {
-                            order = OrderManagement.EditOrder(order);
-                            db.OverwriteOrder(order);
+                            editOrderOrder = OrderManagement.EditOrder(editOrderOrder);
+                            db.OverwriteOrder(editOrderOrder);
                         }
+                        break;
+                    case "5":
+                        var receiptOrder = OrderManagement.ChooseOrderResolved(db);
                         break;
                     default:
                         Console.WriteLine("Invalid Entry");

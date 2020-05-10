@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using expenseTrackerCli.Database;
 
@@ -6,6 +7,28 @@ namespace expenseTrackerCli
 {
     internal static class OrderManagement
     {
+        public static ExpenseOrder EditOrder(ExpenseOrder order)
+        {
+            KeyValuePair<OrderableItem, OrderedItemInfo>[] orderItems = order.orderedItems.ToArray();
+            do
+            {
+                Console.Clear();
+                ConsoleUtilities.DisplayOrderPreorder(order);
+                int resp = ConsoleUtilities.AskUserNumber("Choose Wic to edit.");
+                if (resp.ToString().Length != 6 || !orderItems.Any(x => x.Key.Wic == resp))
+                {
+                    continue;
+                }
+                KeyValuePair<OrderableItem, OrderedItemInfo> selectedItem = orderItems.First(x => x.Key.Wic == resp);
+
+                selectedItem.Value.onHand = ConsoleUtilities.AskUserNumber($"The previous order records {selectedItem.Value.onHand} items as being on hand.  New value = ?");
+                selectedItem.Value.orderedAmount = ConsoleUtilities.AskUserNumber($"The previous order records {selectedItem.Value.orderedAmount} items as being ordered.  New value = ?");
+
+                order.orderedItems = orderItems.ToDictionary(x => x.Key, x => x.Value);
+            }
+            while (!ConsoleUtilities.AskUserBool("Finished editing?"));
+            return order;
+        }
 
         public static ExpenseOrder ChooseOrder(Database.Database db)
         {
@@ -58,13 +81,7 @@ namespace expenseTrackerCli
                          && selectedItemIndex > 0
                          && selectedItemIndex <= currentPage.Length)
                 {
-                    retVal = currentPage.ToArray()[selectedItemIndex - 1];
-                    ConsoleUtilities.DisplayOrderPreorder(retVal);
-                    if (ConsoleUtilities.AskUserBool("Select this order?"))
-                    {
-                        return retVal;
-                    }
-                    retVal = null;
+                    return currentPage.ToArray()[selectedItemIndex - 1];
                 }
             }
             return null;

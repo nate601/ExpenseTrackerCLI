@@ -30,7 +30,8 @@ namespace expenseTrackerCli
                         var order = OrderManagement.ChooseOrder(db);
                         if (!(order is null))
                         {
-                            Console.WriteLine($"{order.OrderDate.ToShortDateString()}");
+                            order = OrderManagement.EditOrder(order);
+                            db.OverWriteOrder(order);
                         }
                         break;
                     default:

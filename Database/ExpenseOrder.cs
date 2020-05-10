@@ -43,6 +43,15 @@ namespace expenseTrackerCli.Database
             ms.Close();
             ms.Dispose();
         }
+        public void OverwriteOrder(ExpenseOrder order)
+        {
+            var k = GetOrders();
+            if (!k.Any(x => order.OrderDate == x.OrderDate))
+            {
+                throw new Exception("Overwrite order called without a matching order already in the database! " + order);
+            }
+            OverwriteOrders(k.Where(x => x.OrderDate != order.OrderDate).ToArray());
+        }
         public void DeleteOrder(ExpenseOrder[] orders, int index)
         {
             var k = orders.ToList();

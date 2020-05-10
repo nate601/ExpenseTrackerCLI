@@ -31,7 +31,7 @@ namespace expenseTrackerCli
                         if (!(order is null))
                         {
                             order = OrderManagement.EditOrder(order);
-                            db.OverWriteOrder(order);
+                            db.OverwriteOrder(order);
                         }
                         break;
                     default:

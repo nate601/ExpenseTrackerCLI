@@ -11,7 +11,7 @@ namespace expenseTrackerCli
         {
             if (db is null)
             {
-                throw new System.ArgumentNullException(nameof(db));
+                throw new ArgumentNullException(nameof(db));
             }
             ExpenseOrder[] orders = db.GetOrders();
             Console.Clear();
@@ -67,7 +67,7 @@ namespace expenseTrackerCli
                     retVal = null;
                 }
             }
-	    return null;
+            return null;
         }
     }
 }

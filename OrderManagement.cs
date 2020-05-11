@@ -19,10 +19,12 @@ namespace expenseTrackerCli
                 {
                     break;
                 }
+
                 if (int.TryParse(resp, out int selectedWic) && (selectedWic.ToString().Length != 6 || !orderItems.Any(x => x.Key.Wic == selectedWic)))
                 {
                     continue;
                 }
+
                 KeyValuePair<OrderableItem, OrderedItemInfo> selectedItem = orderItems.First(x => x.Key.Wic == selectedWic);
 
                 selectedItem.Value.onHand = ConsoleUtilities.AskUserNumber($"The previous order records {selectedItem.Value.onHand} items as being on hand.  New value = ?");
@@ -40,6 +42,7 @@ namespace expenseTrackerCli
             {
                 throw new ArgumentNullException(nameof(db));
             }
+
             ExpenseOrder[] orders = db.GetOrders().OrderBy(x => x.OrderDate.ToFileTimeUtc()).ToArray();
             Console.Clear();
 
@@ -55,10 +58,12 @@ namespace expenseTrackerCli
                 {
                     currentPageIndex = 0;
                 }
+
                 if (currentPageIndex > numberOfPages)
                 {
                     currentPageIndex = numberOfPages;
                 }
+
                 Console.Clear();
                 ExpenseOrder[] currentPage = orders.Skip(currentPageIndex * numberPerPage).Take(numberPerPage).ToArray();
                 Console.WriteLine($"Displaying {currentPage.Length} of {orders.Length} orders.");
@@ -68,6 +73,7 @@ namespace expenseTrackerCli
                     ExpenseOrder order = currentPage[i];
                     Console.WriteLine($"{i + 1} : Order from {order.OrderDate.ToShortDateString()}");
                 }
+
                 string resp = ConsoleUtilities.AskUser("(n)ext page, (p)rev page, (q)uit, or press a number to select an order.");
                 if (resp == "n")
                 {
@@ -88,6 +94,7 @@ namespace expenseTrackerCli
                     return currentPage.ToArray()[selectedItemIndex - 1];
                 }
             }
+
             return null;
         }
 
@@ -97,6 +104,7 @@ namespace expenseTrackerCli
             {
                 throw new ArgumentNullException(nameof(db));
             }
+
             ExpenseOrder[] orders = db.GetOrders().OrderBy(x => x.OrderDate.ToFileTimeUtc()).ToArray();
             Console.Clear();
 
@@ -112,10 +120,12 @@ namespace expenseTrackerCli
                 {
                     currentPageIndex = 0;
                 }
+
                 if (currentPageIndex > numberOfPages)
                 {
                     currentPageIndex = numberOfPages;
                 }
+
                 Console.Clear();
                 ExpenseOrder[] currentPage = orders.Skip(currentPageIndex * numberPerPage).Take(numberPerPage).ToArray();
                 Console.WriteLine($"Displaying {currentPage.Length} of {orders.Length} orders.");
@@ -125,6 +135,7 @@ namespace expenseTrackerCli
                     ExpenseOrder order = currentPage[i];
                     Console.WriteLine($"{i + 1} : Order from {order.OrderDate.ToShortDateString()}. {order.orderedItems.Count(x => x.Value.Resolution?.received != false)}/{order.orderedItems.Count} unresolved items");
                 }
+
                 string resp = ConsoleUtilities.AskUser("(n)ext page, (p)rev page, (q)uit, or press a number to select an order.");
                 if (resp == "n")
                 {
@@ -145,6 +156,7 @@ namespace expenseTrackerCli
                     return currentPage.ToArray()[selectedItemIndex - 1];
                 }
             }
+
             return null;
         }
     }

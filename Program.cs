@@ -29,7 +29,7 @@ namespace expenseTrackerCli
                         OrderableManagement.DisplayOrderables(db);
                         break;
                     case "4":
-                        var editOrderOrder = OrderManagement.ChooseOrder(db);
+                        Database.ExpenseOrder editOrderOrder = OrderManagement.ChooseOrder(db);
                         if (!(editOrderOrder is null))
                         {
                             editOrderOrder = OrderManagement.EditOrder(editOrderOrder);

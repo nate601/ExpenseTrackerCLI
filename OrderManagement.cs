@@ -194,7 +194,16 @@ namespace expenseTrackerCli
                 for (int i = 0; i < currentPage.Length; i++)
                 {
                     ExpenseOrder order = currentPage[i];
-                    Console.WriteLine($"{i + 1} : Order from {order.OrderDate.ToShortDateString()}. {order.orderedItems.Count(x => x.Value.Resolution?.received != false)}/{order.orderedItems.Count} unresolved items");
+                    int unresolvedItems = order.orderedItems.Count((x) =>
+                    {
+                        if (x.Value is null || x.Value.Resolution is null)
+                        {
+                            return true;
+                        }
+
+                        return !x.Value.Resolution.received;
+                    });
+                    Console.WriteLine($"{i + 1} : Order from {order.OrderDate.ToShortDateString()}. {unresolvedItems}/{order.orderedItems.Count} unresolved items");
                 }
 
                 string resp = ConsoleUtilities.AskUser("(n)ext page, (p)rev page, (q)uit, or press a number to select an order.");

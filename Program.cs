@@ -36,7 +36,6 @@ namespace expenseTrackerCli
                             editOrderOrder = OrderManagement.EditOrder(editOrderOrder);
                             db.OverwriteOrder(editOrderOrder);
                         }
-
                         break;
                     case "5":
                         Database.ExpenseOrder receiptOrder = OrderManagement.ChooseOrderResolved(db);
@@ -50,7 +49,6 @@ namespace expenseTrackerCli
 
                             db.OverwriteOrder(receiptOrder);
                         }
-
                         break;
                     default:
                         Console.WriteLine("Invalid Entry");

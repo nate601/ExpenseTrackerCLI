@@ -6,7 +6,7 @@ using static expenseTrackerCli.ConsoleUtilities;
 
 namespace expenseTrackerCli
 {
-    internal class Creation
+    internal static class Creation
     {
         internal static void OrderablePrompt(Database.Database db)
         {

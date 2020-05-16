@@ -30,14 +30,23 @@ namespace expenseTrackerCli
                         break;
                     case "4":
                         Database.ExpenseOrder editOrderOrder = OrderManagement.ChooseOrder(db);
-                        if (!(editOrderOrder is null))
+                        if (editOrderOrder != null)
                         {
                             editOrderOrder = OrderManagement.EditOrder(editOrderOrder);
                             db.OverwriteOrder(editOrderOrder);
                         }
                         break;
                     case "5":
-                        var receiptOrder = OrderManagement.ChooseOrderResolved(db);
+                        Database.ExpenseOrder receiptOrder = OrderManagement.ChooseOrderResolved(db);
+                        if (receiptOrder != null)
+                        {
+                            receiptOrder = OrderManagement.ResolveOrder(receiptOrder);
+			    if(receiptOrder == null)
+			    {
+				break;
+			    }
+                            db.OverwriteOrder(receiptOrder);
+                        }
                         break;
                     default:
                         Console.WriteLine("Invalid Entry");

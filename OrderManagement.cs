@@ -107,6 +107,7 @@ namespace expenseTrackerCli
             ExpenseOrder retOrder = receiptOrder;
             while (true)
             {
+                Console.Clear();
                 DisplayOrderableResolutionTable(retOrder);
 
                 string resp = ConsoleUtilities.AskUser("(q)uit, resolve (a)ll, resolve (n)one, or type a wic number to change the resolution of an individual item");

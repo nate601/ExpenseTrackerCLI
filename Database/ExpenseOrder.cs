@@ -45,6 +45,12 @@ namespace expenseTrackerCli.Database
         }
         public void OverwriteOrder(ExpenseOrder order)
         {
+            if (order is null)
+            {
+		Console.WriteLine("No order selected!");
+		return;
+            }
+
             var k = GetOrders();
             if (!k.Any(x => order.OrderDate == x.OrderDate))
             {

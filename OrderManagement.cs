@@ -104,18 +104,23 @@ namespace expenseTrackerCli
             {
                 throw new ArgumentNullException(nameof(receiptOrder));
             }
-            var retOrder = receiptOrder;
-            Console.WriteLine($"|Wic   |Item Name      |Received|");
-            foreach (var item in retOrder.orderedItems)
-            {
-                if (item.Value.Resolution is null)
-                {
-                    item.Value.Resolution = new ItemResolution(false, null);
-                }
-
-                Console.WriteLine($"|{item.Key.Wic,6:d6}|{item.Key.ItemName,-15}|{(item.Value.Resolution.received ? "Received" : "Pending"), -8}|");
-            }
+            ExpenseOrder retOrder = receiptOrder;
+            DisplayOrderableResolutionTable(retOrder);
             return null;
+
+            static void DisplayOrderableResolutionTable(ExpenseOrder retOrder)
+            {
+                Console.WriteLine("|Wic   |Item Name      |Received|");
+                foreach (KeyValuePair<OrderableItem, OrderedItemInfo> item in retOrder.orderedItems)
+                {
+                    if (item.Value.Resolution is null)
+                    {
+                        item.Value.Resolution = new ItemResolution(false, null);
+                    }
+
+                    Console.WriteLine($"|{item.Key.Wic,6:d6}|{item.Key.ItemName,-15}|{(item.Value.Resolution.received ? "Received" : "Pending"),-8}|");
+                }
+            }
         }
 
         public static ExpenseOrder ChooseOrderResolved(Database.Database db)

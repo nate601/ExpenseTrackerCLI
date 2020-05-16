@@ -105,8 +105,40 @@ namespace expenseTrackerCli
                 throw new ArgumentNullException(nameof(receiptOrder));
             }
             ExpenseOrder retOrder = receiptOrder;
-            DisplayOrderableResolutionTable(retOrder);
-            return null;
+            while (true)
+            {
+                DisplayOrderableResolutionTable(retOrder);
+
+                string resp = ConsoleUtilities.AskUser("(q)uit, resolve (a)ll, resolve (n)one, or type a wic number to change the resolution of an individual item");
+                if (resp == "q")
+                {
+                    break;
+                }
+
+                if (resp == "a")
+                {
+                    foreach (var item in retOrder.orderedItems)
+                    {
+                        item.Value.Resolution.received = true;
+                    }
+                    continue;
+                }
+
+                if (resp == "n")
+                {
+                    foreach (var item in retOrder.orderedItems)
+                    {
+                        item.Value.Resolution.received = false;
+                    }
+                    continue;
+                }
+		
+                if (resp.Length <= 6 && int.TryParse(resp, out var wic))
+                {
+                    retOrder.orderedItems.First(x => x.Key.Wic == wic).Value.Resolution.received = !retOrder.orderedItems.First(x => x.Key.Wic == wic).Value.Resolution.received;
+                }
+            }
+            return retOrder;
 
             static void DisplayOrderableResolutionTable(ExpenseOrder retOrder)
             {

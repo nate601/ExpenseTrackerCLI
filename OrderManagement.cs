@@ -132,9 +132,13 @@ namespace expenseTrackerCli
                     }
                     continue;
                 }
-		
-                if (resp.Length <= 6 && int.TryParse(resp, out var wic))
+
+                if (resp.Length <= 6 && int.TryParse(resp, out int wic))
                 {
+		    if(!retOrder.orderedItems.Any(x=>x.Key.Wic==wic))
+		    {
+			continue;
+		    }
                     retOrder.orderedItems.First(x => x.Key.Wic == wic).Value.Resolution.received = !retOrder.orderedItems.First(x => x.Key.Wic == wic).Value.Resolution.received;
                 }
             }

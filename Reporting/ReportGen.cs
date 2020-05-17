@@ -17,6 +17,7 @@ namespace expenseTrackerCli
 
             Report rpt = new Report("PendingReceipt");
             ExpenseOrder[] orders = db.GetOrders();
+            var orderables = db.GetOrderables();
             // Get list of orders that have at least one item that has not been received
             orders = orders.Where(currentOrder => currentOrder.orderedItems.Any(currentOrderedItem => currentOrderedItem.Value.Resolution?.received != true)).ToArray();
             int totalNumberOfMissingItems = 0;
@@ -45,33 +46,33 @@ namespace expenseTrackerCli
             rpt.AddHeader("Number of Pending Items per Wic");
             rpt.AddLine("The following are the number of items for each wic that are pending");
             rpt.AddBlank();
-            data.Clear();
-            Dictionary<string, int> wicToPendingItemCountMap = new Dictionary<string, int>();
-            orders.ToList().ForEach(x => x.orderedItems.ToList().ForEach(y =>
+            data = new List<string>();
+            Dictionary<int, int> wicToPendingItemCountMap = new Dictionary<int, int>();
+            orders.ToList().ForEach(currentOrder => currentOrder.orderedItems.ToList().ForEach(currentItem =>
             {
-                if (y.Value.Resolution?.received != true)
+                if (currentItem.Value.Resolution?.received != true)
                 {
-                    if (wicToPendingItemCountMap.ContainsKey(y.Key.Wic.ToString()))
+                    if (wicToPendingItemCountMap.ContainsKey(currentItem.Key.Wic))
                     {
-                        wicToPendingItemCountMap[y.Key.Wic.ToString()]++;
+                        wicToPendingItemCountMap[currentItem.Key.Wic] += currentItem.Value.orderedAmount;
                     }
                     else
                     {
-                        wicToPendingItemCountMap.Add(y.Key.Wic.ToString(), 1);
+                        wicToPendingItemCountMap.Add(currentItem.Key.Wic, currentItem.Value.orderedAmount);
                     }
-
                 }
             }));
-            wicToPendingItemCountMap.ToArray().ToList().ForEach(x =>
+            foreach (KeyValuePair<int, int> wicToPendingItem in wicToPendingItemCountMap.ToArray())
             {
-                data.Add(x.Key);
-                data.Add(x.Value.ToString());
-            });
-            rpt.AddTable(new string[] { "Wic", "Number of Pending Items" }, data.ToArray());
-            rpt.DebugPrintToConsole();
+                int wic = wicToPendingItem.Key;
+                int numberOfItemsPending = wicToPendingItem.Value;
+
+                data.Add(wic.ToString());
+                data.Add(orderables.First(y => y.Wic == wic).ItemName);
+                data.Add(numberOfItemsPending.ToString());
+            }
+            rpt.AddTable(new string[] { "Wic", "Item Name", "Number of Pending Items" }, data.ToArray());
             rpt.SaveReport();
-
-
         }
 
         internal static void CreateOrderReport(ExpenseOrder order)

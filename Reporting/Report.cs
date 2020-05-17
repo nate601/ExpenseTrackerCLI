@@ -37,23 +37,27 @@ namespace expenseTrackerCli.Reporting
 
         public void AddHeader(string headerName)
         {
-            _ = stringBuilder.Append('#').AppendLine(headerName);
+            _ = stringBuilder.Append("# ").AppendLine(headerName);
         }
 
         public void AddTable(string[] headers, string[] values)
         {
             int numberOfColumns = headers.Length;
+            int numberOfRows = values.Length / numberOfColumns;
             Add("|");
             headers.ToList().ForEach(x => Add($"{x}|"));
             AddNewLine();
             Add("|");
             headers.ToList().ForEach(_ => Add("---|"));
             AddNewLine();
-            for (int i = 0; i < values.Length / numberOfColumns; i++)
+            for (int i = 0; i < numberOfRows; i++)
             {
-                System.Collections.Generic.IEnumerable<string> currentRow = values.Skip(i * values.Length / numberOfColumns).Take(numberOfColumns);
+                string[] currentRow = values.Skip(i * numberOfColumns).Take(numberOfColumns).ToArray();
                 Add("|");
-                currentRow.ToList().ForEach(x => Add($"{x}|"));
+                foreach(string x in currentRow)
+                {
+                    Add($"{x}|");
+                }
                 AddNewLine();
             }
         }

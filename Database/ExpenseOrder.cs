@@ -47,8 +47,8 @@ namespace expenseTrackerCli.Database
         {
             if (order is null)
             {
-		Console.WriteLine("No order selected!");
-		return;
+                Console.WriteLine("No order selected!");
+                return;
             }
 
             var k = GetOrders();
@@ -105,8 +105,12 @@ namespace expenseTrackerCli.Database
     public class OrderedItemInfo
     {
         public int onHand, orderedAmount;
-	public ItemResolution Resolution;
+        public ItemResolution Resolution;
 
+        public bool HasBeenReceived()
+        {
+            return orderedAmount <= 0 || Resolution?.received == true;
+        }
         public OrderedItemInfo(int onHand, int orderedAmount)
         {
             this.onHand = onHand;

@@ -50,6 +50,7 @@ namespace expenseTrackerCli
                         }
                         break;
                     case "6":
+                        ReportGen.CreateNotReceiptReport(db, DateTime.Today);
                         break;
                     default:
                         Console.WriteLine("Invalid Entry");

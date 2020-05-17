@@ -155,7 +155,7 @@ namespace expenseTrackerCli
                         item.Value.Resolution = new ItemResolution(false, null);
                     }
 
-                    Console.WriteLine($"|{item.Key.Wic,6:d6}|{item.Key.ItemName,-15}|{(item.Value.Resolution.received ? "Received" : "Pending"),-8}|");
+                    Console.WriteLine($"|{item.Key.Wic,6:d6}|{item.Key.ItemName,-15}|{(item.Value.HasBeenReceived() ? "Received" : "Pending"),-8}|");
                 }
             }
         }
@@ -195,15 +195,7 @@ namespace expenseTrackerCli
                 for (int i = 0; i < currentPage.Length; i++)
                 {
                     ExpenseOrder order = currentPage[i];
-                    int unresolvedItems = order.orderedItems.Count((x) =>
-                    {
-                        if (x.Value is null || x.Value.Resolution is null)
-                        {
-                            return true;
-                        }
-
-                        return !x.Value.Resolution.received;
-                    });
+                    int unresolvedItems = order.orderedItems.Count((x) => !x.Value.HasBeenReceived());
                     Console.WriteLine($"{i + 1} : Order from {order.OrderDate.ToShortDateString()}. {unresolvedItems}/{order.orderedItems.Count} unresolved items");
                 }
 

@@ -19,11 +19,11 @@ namespace expenseTrackerCli
             ExpenseOrder[] orders = db.GetOrders();
             var orderables = db.GetOrderables();
             // Get list of orders that have at least one item that has not been received
-            orders = orders.Where(currentOrder => currentOrder.orderedItems.Any(currentOrderedItem => currentOrderedItem.Value.Resolution?.received != true)).ToArray();
+            orders = orders.Where(currentOrder => currentOrder.orderedItems.Any(currentOrderedItem => currentOrderedItem.Value.HasBeenReceived())).ToArray();
             int totalNumberOfMissingItems = 0;
             orders.ToList().ForEach(x => x.orderedItems.ToList().ForEach(y =>
             {
-                if (y.Value.Resolution?.received != true)
+                if (!y.Value.HasBeenReceived())
                 {
                     totalNumberOfMissingItems++;
                 }
@@ -39,7 +39,7 @@ namespace expenseTrackerCli
             orders.ToList().ForEach(x =>
             {
                 data.Add(x.OrderDate.ToShortDateString());
-                data.Add(x.orderedItems.Count(y => y.Value.Resolution?.received != true).ToString());
+                data.Add(x.orderedItems.Count(y => !y.Value.HasBeenReceived()).ToString());
             });
             rpt.AddBlank();
             rpt.AddTable(new string[] { "Order Date", "Number of Pending Items" }, data.ToArray());
@@ -51,7 +51,7 @@ namespace expenseTrackerCli
             Dictionary<int, int> wicToPendingItemCountMap = new Dictionary<int, int>();
             orders.ToList().ForEach(currentOrder => currentOrder.orderedItems.ToList().ForEach(currentItem =>
             {
-                if (currentItem.Value.Resolution?.received != true)
+                if (!currentItem.Value.HasBeenReceived())
                 {
                     if (wicToPendingItemCountMap.ContainsKey(currentItem.Key.Wic))
                     {

@@ -41,6 +41,7 @@ namespace expenseTrackerCli
                 data.Add(x.OrderDate.ToShortDateString());
                 data.Add(x.orderedItems.Count(y => y.Value.Resolution?.received != true).ToString());
             });
+            rpt.AddBlank();
             rpt.AddTable(new string[] { "Order Date", "Number of Pending Items" }, data.ToArray());
             rpt.AddBlank();
             rpt.AddHeader("Number of Pending Items per Wic");

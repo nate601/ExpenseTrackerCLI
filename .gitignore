@@ -11,6 +11,8 @@
 /node_modules
 /wwwroot/node_modules
 
+#report files
+*.md
 
 ### Vim ###
 # Swap

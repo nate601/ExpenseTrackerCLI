@@ -54,7 +54,7 @@ namespace expenseTrackerCli.Reporting
             {
                 string[] currentRow = values.Skip(i * numberOfColumns).Take(numberOfColumns).ToArray();
                 Add("|");
-                foreach(string x in currentRow)
+                foreach (string x in currentRow)
                 {
                     Add($"{x}|");
                 }

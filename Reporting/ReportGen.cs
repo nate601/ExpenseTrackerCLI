@@ -32,7 +32,7 @@ namespace expenseTrackerCli
 
             rpt.AddHeader("Introduction");
             rpt.AddBlank();
-            rpt.AddLine($"This file describes the pending status of pharmacy expense items.  This file is accurate as of {reportAsOf.ToShortDateString()}.  There are {orders.Count()} orders with pending items.  There are {totalNumberOfMissingItems} items that are pending.  These items are critical to the operation of the pharmacy.");
+            rpt.AddLine($"This file describes the pending status of pharmacy expense items.  This file is accurate as of {reportAsOf.ToShortDateString()}.  There are {orders.Count(x=>x.orderedItems.Any(x=>x.Value.HasBeenReceived()))} orders with pending items.  There are {totalNumberOfMissingItems} items that are pending.  These items are critical to the operation of the pharmacy.");
             rpt.AddBlank();
             rpt.AddHeader("Orders with Pending Items");
             rpt.AddLine("The following orders have pending items.");

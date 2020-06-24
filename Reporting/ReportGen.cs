@@ -16,10 +16,11 @@ namespace expenseTrackerCli
             }
 
             Report rpt = new Report("PendingReceipt");
-            ExpenseOrder[] orders = db.GetOrders();
+            ExpenseOrder[] allorders = db.GetOrders();
             var orderables = db.GetOrderables();
             // Get list of orders that have at least one item that has not been received
-            orders = orders.Where(currentOrder => currentOrder.orderedItems.Any(currentOrderedItem => currentOrderedItem.Value.HasBeenReceived())).ToArray();
+            //var orders = allorders.Where(currentOrder => currentOrder.orderedItems.Any(currentOrderedItem => currentOrderedItem.Value.HasBeenReceived())).ToArray();
+            var orders = allorders.Where(currentOrder => currentOrder.orderedItems.Any(currentOrderedItem => currentOrderedItem.Value.HasBeenReceived()));
             int totalNumberOfMissingItems = 0;
             orders.ToList().ForEach(x => x.orderedItems.ToList().ForEach(y =>
             {
@@ -31,7 +32,7 @@ namespace expenseTrackerCli
 
             rpt.AddHeader("Introduction");
             rpt.AddBlank();
-            rpt.AddLine($"This file describes the pending status of pharmacy expense items.  This file is accurate as of {reportAsOf.ToShortDateString()}.  There are {orders.Length} orders with pending items.  There are {totalNumberOfMissingItems} items that are pending.  These items are critical to the operation of the pharmacy.");
+            rpt.AddLine($"This file describes the pending status of pharmacy expense items.  This file is accurate as of {reportAsOf.ToShortDateString()}.  There are {orders.Count()} orders with pending items.  There are {totalNumberOfMissingItems} items that are pending.  These items are critical to the operation of the pharmacy.");
             rpt.AddBlank();
             rpt.AddHeader("Orders with Pending Items");
             rpt.AddLine("The following orders have pending items.");
@@ -63,14 +64,9 @@ namespace expenseTrackerCli
                     }
                 }
             }));
-            foreach (KeyValuePair<int, int> wicToPendingItem in wicToPendingItemCountMap.ToArray())
+            foreach (var item in wicToPendingItemCountMap)
             {
-                int wic = wicToPendingItem.Key;
-                int numberOfItemsPending = wicToPendingItem.Value;
-
-                data.Add(wic.ToString());
-                data.Add(orderables.First(y => y.Wic == wic).ItemName);
-                data.Add(numberOfItemsPending.ToString());
+                Console.Write($"{item.Key}, {orderables.First(x=>x.Wic == item.Key).ItemName}, {item.Value}");
             }
             rpt.AddTable(new string[] { "Wic", "Item Name", "Number of Pending Items" }, data.ToArray());
             rpt.SaveReport();

@@ -13,6 +13,7 @@
 
 #report files
 *.md
+*.pdf
 
 ### Vim ###
 # Swap

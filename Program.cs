@@ -41,7 +41,8 @@ namespace expenseTrackerCli
                         Database.ExpenseOrder receiptOrder = OrderManagement.ChooseOrderResolved(db);
                         if (receiptOrder != null)
                         {
-                            receiptOrder = OrderManagement.ResolveOrder(receiptOrder); if (receiptOrder == null)
+                            receiptOrder = OrderManagement.ResolveOrder(receiptOrder);
+                            if (receiptOrder == null)
                             {
                                 break;
                             }

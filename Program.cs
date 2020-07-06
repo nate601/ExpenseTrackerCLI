@@ -21,7 +21,7 @@ namespace expenseTrackerCli
             Console.WriteLine("3: Edit orderable database");
             Console.WriteLine("4: Edit order");
             Console.WriteLine("5: Receipt");
-            Console.WriteLine("6: Print Reports");
+            Console.WriteLine("6: Create Receipt Report");
             switch (Console.ReadLine())
             {
                 case "1":
